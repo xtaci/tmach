@@ -13,19 +13,19 @@ const (
 )
 
 const (
-	IN = iota
-	OUT
-	LOAD // LOAD [REGn], REGm
-	STOR // STOR REGn, [REGm]
-	ADD  // ADD REGn, REGm
-	SUB  // SUB REGn, REGm
-	MUL  // MUL REGn, REGm
-	DIV  // DIV REGn, REGm
-	INC  // INC REGn
-	DEC  // DEC REGn
-	JMP  // JMP REGn
-	JZ   // JZ REGn
-	JGZ  // JGZ REGn
-	JLZ  // JLZ REGn
+	IN   = iota // IN REGn
+	OUT         // OUT REGn
+	LOAD        // LOAD [REGn], REGm
+	STOR        // STOR REGn, [REGm]
+	ADD         // ADD REGn, REGm
+	SUB         // SUB REGn, REGm
+	MUL         // MUL REGn, REGm
+	DIV         // DIV REGn, REGm
+	INC         // INC REGn
+	DEC         // DEC REGn
+	JMP         // JMP REGn
+	JZ          // JZ REGn
+	JGZ         // JGZ REGn
+	JLZ         // JLZ REGn
 	HLT
 )
