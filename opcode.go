@@ -1,0 +1,22 @@
+package main
+
+const (
+	INBOX = iota
+	OUTBOX
+	COPYFROM
+	COPYTO
+	ADD
+	SUB
+	INC
+	DEC
+	JMP
+	JZ
+	JLZ
+	// INDIRECT ACCESS
+	MCOPYFROM
+	MCOPYTO
+	MADD
+	MSUB
+	MINC
+	MDEC
+)
