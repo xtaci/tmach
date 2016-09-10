@@ -34,12 +34,12 @@ func (p *Program) run() {
 			n := p.code[pc+1]
 			p.in <- p.reg[n]
 			pc += 2
-		case LOAD:
+		case LD:
 			n := p.code[pc+1]
 			m := p.code[pc+2]
 			p.reg[m] = p.data[n]
 			pc += 3
-		case STOR:
+		case ST:
 			n := p.code[pc+1]
 			m := p.code[pc+2]
 			p.data[m] = p.reg[n]

@@ -1,0 +1,4 @@
+IN R0
+OUT R0
+LDR 0 R1
+JMP R1
