@@ -9,6 +9,7 @@ const (
 	REG6
 	REG7
 	REG8
+	REGNUM
 )
 
 const (
@@ -26,4 +27,5 @@ const (
 	JZ   // JZ REGn
 	JGZ  // JGZ REGn
 	JLZ  // JLZ REGn
+	HLT
 )
