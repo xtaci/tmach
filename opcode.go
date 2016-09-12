@@ -10,13 +10,25 @@ const (
 	R6
 	R7
 	R8
-	CPSR // Current Processor Status Register
+	R9
+	R10
+	R11
+	R12
+
+	R13  // R13(sp) stack pointer
+	R14  // R14(lr) link register
+	R15  // R15(pc) program counter
+	CPSR // current program status register
+	SPSR // saved program status register
 	REGCOUNT
 )
 
 const (
-	CPSR_NEG = 1 << iota
-	CPSR_ZERO
+	// The Program Status Registers (CPSR and SPSRs)
+	COND_NEG      = 1 << 31 // Negative result from ALU flag
+	COND_ZERO     = 1 << 30 // Zero result from ALU flag.
+	COND_CARRY    = 1 << 29 // ALU operation Carried out
+	COND_OVERFLOW = 1 << 28 // ALU operation oVerflowed
 )
 
 const (

@@ -6,6 +6,12 @@ const (
 	EOF
 	COMMENT
 
+	literal_beg
+	INT
+	FLOAT
+	STRING
+	literal_end
+
 	reg_beg
 	R0
 	R1
@@ -16,6 +22,13 @@ const (
 	R6
 	R7
 	R8
+	R9
+	R10
+	R11
+	R12
+	R13
+	R14
+	R15
 	reg_end
 
 	opcode_beg
@@ -44,15 +57,22 @@ var tokens = [...]string{
 	EOF:     "EOF",
 	COMMENT: "COMMENT",
 
-	R0: "R0",
-	R1: "R1",
-	R2: "R2",
-	R3: "R3",
-	R4: "R4",
-	R5: "R5",
-	R6: "R6",
-	R7: "R7",
-	R8: "R8",
+	R0:  "R0",
+	R1:  "R1",
+	R2:  "R2",
+	R3:  "R3",
+	R4:  "R4",
+	R5:  "R5",
+	R6:  "R6",
+	R7:  "R7",
+	R8:  "R8",
+	R9:  "R9",
+	R10: "R10",
+	R11: "R11",
+	R12: "R12",
+	R13: "R13",
+	R14: "R14",
+	R15: "R15",
 
 	IN:  "IN",
 	OUT: "OUT",
@@ -101,14 +121,10 @@ func init() {
 	}
 }
 
-func LookupKeyword(ident string) Token {
+func Lookup(ident string) Token {
 	if tok, is_opcode := opcodes[ident]; is_opcode {
 		return tok
 	}
-	return ILLEGAL
-}
-
-func LookupRegister(ident string) Token {
 	if tok, is_reg := registers[ident]; is_reg {
 		return tok
 	}
