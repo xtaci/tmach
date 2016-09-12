@@ -32,21 +32,22 @@ const (
 )
 
 const (
-	IN  = iota // IN REGn
-	OUT        // OUT REGn
-	LD         // LD [REGn], REGm
-	ST         // ST REGn, [REGm]
-	LDR        // LDR IMM, REGn
-	XOR        // XOR REGn, REGm
-	ADD        // ADD REGn, REGm
-	SUB        // SUB REGn, REGm
-	MUL        // MUL REGn, REGm
-	DIV        // DIV REGn, REGm
-	INC        // INC REGn
-	DEC        // DEC REGn
-	JMP        // JMP IMM
-	JZ         // JZ IMM
-	JGZ        // JGZ IMM
-	JLZ        // JLZ IMM
+	IN  = iota // IN Rn
+	OUT        // OUT Rn
+	LD         // LD Rn, Rm
+	ST         // ST Rn, Rm
+	XOR        // XOR Rn, Rm/Imm
+	ADD        // ADD Rn, Rm/Imm
+	SUB        // SUB Rn, Rm/Imm
+	MUL        // MUL Rn, Rm/Imm
+	DIV        // DIV Rn, Rm/Imm
+	INC        // INC Rn
+	DEC        // DEC Rn
+	B          // B label
+	BZ         // BZ label
+	BN         // BN label
+	BX         // BX Rn
+	BXZ        // BXZ Rn
+	BXN        // BXN Rn
 	HLT
 )

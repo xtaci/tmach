@@ -1,5 +1,7 @@
 package compiler
 
+import "strconv"
+
 const (
 	// Special tokens
 	ILLEGAL Token = iota
@@ -32,22 +34,23 @@ const (
 	reg_end
 
 	opcode_beg
-	IN  // IN REGn
-	OUT // OUT REGn
-	LD  // LD [REGn], REGm
-	ST  // ST REGn, [REGm]
-	LDR // LDR IMM, REGn
-	XOR // XOR REGn, REGm
-	ADD // ADD REGn, REGm
-	SUB // SUB REGn, REGm
-	MUL // MUL REGn, REGm
-	DIV // DIV REGn, REGm
-	INC // INC REGn
-	DEC // DEC REGn
-	JMP // JMP IMM
-	JZ  // JZ IMM
-	JGZ // JGZ IMM
-	JLZ // JLZ IMM
+	IN  // IN Rn
+	OUT // OUT Rn
+	LD  // LD Rn, Rm
+	ST  // ST Rn, Rm
+	XOR // XOR Rn, Rm/Imm
+	ADD // ADD Rn, Rm/Imm
+	SUB // SUB Rn, Rm/Imm
+	MUL // MUL Rn, Rm/Imm
+	DIV // DIV Rn, Rm/Imm
+	INC // INC Rn
+	DEC // DEC Rn
+	B   // B label
+	BZ  // BZ label
+	BN  // BN label
+	BX  // BX Rn
+	BXZ // BXZ Rn
+	BXN // BXN Rn
 	HLT
 	opcode_end
 )
@@ -78,7 +81,6 @@ var tokens = [...]string{
 	OUT: "OUT",
 	LD:  "LD",
 	ST:  "ST",
-	LDR: "LDR",
 	XOR: "XOR",
 	ADD: "AND",
 	SUB: "SUB",
@@ -86,25 +88,30 @@ var tokens = [...]string{
 	DIV: "DIV",
 	INC: "INC",
 	DEC: "DEC",
-	JMP: "JMP",
-	JZ:  "JZ",
-	JGZ: "JGZ",
-	JLZ: "JLZ",
+	B:   "B",
+	BN:  "BN",
+	BZ:  "BZ",
+	BX:  "BX",
+	BXN: "BXN",
+	BXZ: "BXZ",
 	HLT: "HLT",
 }
 
 type Token int
 
-func (t *Token) IsOperator() bool {
-	return false
-}
+func (tok Token) IsOperator() bool { return opcode_beg < tok && tok < opcode_end }
+func (tok Token) IsLiteral() bool  { return literal_beg < tok && tok < literal_end }
+func (tok Token) IsRegister() bool { return reg_beg < tok && tok < reg_end }
 
-func (t *Token) IsLiteral() bool {
-	return false
-}
-
-func (t *Token) String() string {
-	return ""
+func (tok Token) String() string {
+	s := ""
+	if 0 <= tok && tok < Token(len(tokens)) {
+		s = tokens[tok]
+	}
+	if s == "" {
+		s = "token(" + strconv.Itoa(int(tok)) + ")"
+	}
+	return s
 }
 
 var opcodes map[string]Token
