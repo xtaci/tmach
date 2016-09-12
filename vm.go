@@ -1,7 +1,7 @@
 package tmach
 
 type Program struct {
-	reg  [REGNUM]int32
+	reg  [REGCOUNT]int32
 	data []int32
 	code []byte
 	in   chan int32
