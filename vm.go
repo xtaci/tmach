@@ -22,7 +22,7 @@ func (p *Program) Load(code []byte) {
 }
 
 func (p *Program) run() {
-	pc := 0
+	pc := p.reg[PC]
 	for p.code[pc] != HLT {
 		opcode := p.code[pc]
 		switch opcode {

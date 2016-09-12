@@ -21,6 +21,10 @@ const (
 	CPSR // current program status register
 	SPSR // saved program status register
 	REGCOUNT
+
+	SP = R13
+	LR = R14
+	PC = R15
 )
 
 const (
