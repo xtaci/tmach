@@ -7,6 +7,7 @@ const (
 	ILLEGAL Token = iota
 	EOF
 	COMMENT
+	MINUS
 
 	literal_beg
 	INT

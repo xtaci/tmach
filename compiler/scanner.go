@@ -52,6 +52,8 @@ func (s *Scanner) Scan() (pos Pos, tok Token, lit string) {
 		switch ch {
 		case -1:
 			tok = EOF
+		case '-':
+			tok = MINUS
 		default:
 			// next reports unexpected BOMs - don't repeat
 			if ch != bom {
