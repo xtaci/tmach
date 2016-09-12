@@ -9,7 +9,13 @@ const (
 	R6
 	R7
 	R8
+	CPSR // Current Processor Status Register
 	REGNUM
+)
+
+const (
+	CPSR_NEG = 1 << iota
+	CPSR_ZERO
 )
 
 const (
@@ -17,7 +23,7 @@ const (
 	OUT        // OUT REGn
 	LD         // LD [REGn], REGm
 	ST         // ST REGn, [REGm]
-	LDR        // LDR Imm, REGn
+	LDR        // LDR IMM, REGn
 	XOR        // XOR REGn, REGm
 	ADD        // ADD REGn, REGm
 	SUB        // SUB REGn, REGm
@@ -25,9 +31,9 @@ const (
 	DIV        // DIV REGn, REGm
 	INC        // INC REGn
 	DEC        // DEC REGn
-	JMP        // JMP REGn
-	JZ         // JZ REGn
-	JGZ        // JGZ REGn
-	JLZ        // JLZ REGn
+	JMP        // JMP IMM
+	JZ         // JZ IMM
+	JGZ        // JGZ IMM
+	JLZ        // JLZ IMM
 	HLT
 )
