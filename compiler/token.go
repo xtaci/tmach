@@ -34,23 +34,28 @@ const (
 	reg_end
 
 	opcode_beg
-	IN  // IN Rn
-	OUT // OUT Rn
-	LD  // LD Rn, Rm
-	ST  // ST Rn, Rm
-	XOR // XOR Rn, Rm/Imm
-	ADD // ADD Rn, Rm/Imm
-	SUB // SUB Rn, Rm/Imm
-	MUL // MUL Rn, Rm/Imm
-	DIV // DIV Rn, Rm/Imm
-	INC // INC Rn
-	DEC // DEC Rn
-	B   // B label
-	BZ  // BZ label
-	BN  // BN label
-	BX  // BX Rn
-	BXZ // BXZ Rn
-	BXN // BXN Rn
+	IN   // IN Rn
+	OUT  // OUT Rn
+	LD   // LD Rn, Rm
+	ST   // ST Rn, Rm
+	XOR  // XOR Rn, Rm/Imm
+	ADD  // ADD Rn, Rm/Imm
+	SUB  // SUB Rn, Rm/Imm
+	MUL  // MUL Rn, Rm/Imm
+	DIV  // DIV Rn, Rm/Imm
+	IXOR // IXOR Rn, Imm
+	IADD // IADD Rn, Imm
+	ISUB // ISUB Rn, Imm
+	IMUL // IMUL Rn, Imm
+	IDIV // IDIV Rn, Imm
+	INC  // INC Rn
+	DEC  // DEC Rn
+	B    // B label
+	BZ   // BZ label
+	BN   // BN label
+	BX   // BX Rn
+	BXZ  // BXZ Rn
+	BXN  // BXN Rn
 	HLT
 	opcode_end
 )
@@ -77,24 +82,29 @@ var tokens = [...]string{
 	R14: "R14",
 	R15: "R15",
 
-	IN:  "IN",
-	OUT: "OUT",
-	LD:  "LD",
-	ST:  "ST",
-	XOR: "XOR",
-	ADD: "AND",
-	SUB: "SUB",
-	MUL: "MUL",
-	DIV: "DIV",
-	INC: "INC",
-	DEC: "DEC",
-	B:   "B",
-	BN:  "BN",
-	BZ:  "BZ",
-	BX:  "BX",
-	BXN: "BXN",
-	BXZ: "BXZ",
-	HLT: "HLT",
+	IN:   "IN",
+	OUT:  "OUT",
+	LD:   "LD",
+	ST:   "ST",
+	XOR:  "XOR",
+	ADD:  "AND",
+	SUB:  "SUB",
+	MUL:  "MUL",
+	DIV:  "DIV",
+	IXOR: "IXOR",
+	IADD: "IADD",
+	ISUB: "ISUB",
+	IMUL: "IMUL",
+	IDIV: "IDIV",
+	INC:  "INC",
+	DEC:  "DEC",
+	B:    "B",
+	BN:   "BN",
+	BZ:   "BZ",
+	BX:   "BX",
+	BXN:  "BXN",
+	BXZ:  "BXZ",
+	HLT:  "HLT",
 }
 
 type Token int

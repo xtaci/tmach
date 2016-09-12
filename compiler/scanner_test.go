@@ -5,14 +5,12 @@ import (
 	"testing"
 )
 
-var src = `
-IN R0
-OUT R0
-LDR 0 R1
-JMP R1
-`
-
 func TestScanner(t *testing.T) {
+	var src = `
+	IN R0
+	OUT R0
+	B -2
+	`
 	s := Scanner{}
 	s.Init([]byte(src))
 	pos, tok, lit := s.Scan()

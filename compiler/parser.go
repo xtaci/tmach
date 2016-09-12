@@ -1,7 +1,7 @@
 package compiler
 
 // The parser structure holds the parser's internal state.
-type parser struct {
+type Parser struct {
 	scanner Scanner
 
 	pos Pos    // token position
@@ -9,22 +9,24 @@ type parser struct {
 	lit string // token literal
 }
 
-func (p *parser) init(src []byte) {
+func (p *Parser) Init(src []byte) {
 	p.scanner.Init(src)
 	p.next()
 }
 
-func (p *parser) Parse() []interface{} {
+func (p *Parser) Parse() []interface{} {
 	var cmds []interface{}
 	for {
 		if p.tok != EOF {
 			cmds = append(cmds, p.parseCommand())
 			p.next()
+		} else {
+			return cmds
 		}
 	}
 }
 
-func (p *parser) parseCommand() interface{} {
+func (p *Parser) parseCommand() interface{} {
 	if p.tok.IsOperator() {
 		switch p.tok {
 		case IN, OUT, INC, DEC: // unary
@@ -54,16 +56,36 @@ func (p *parser) parseCommand() interface{} {
 			if p.tok.IsRegister() {
 				cmd.X = p.tok
 				p.next()
-				if p.tok.IsRegister() || p.tok.IsLiteral() {
+				if p.tok.IsRegister() {
 					cmd.Y = p.tok
 					return cmd
 				}
 			}
-		case B, BX, BZ, BXZ, BN, BXN: // branch
+		case IXOR, IADD, ISUB, IMUL, IDIV: // binary
+			cmd := BinaryCommand{}
+			cmd.Op = p.tok
+			p.next()
+			if p.tok.IsRegister() {
+				cmd.X = p.tok
+				p.next()
+				if p.tok.IsLiteral() {
+					cmd.Y = p.tok
+					return cmd
+				}
+			}
+		case B, BZ, BN: // branch
 			cmd := UnaryCommand{}
 			cmd.Op = p.tok
 			p.next()
-			if p.tok.IsRegister() || p.tok.IsLiteral() {
+			if p.tok.IsRegister() {
+				cmd.X = p.tok
+				return cmd
+			}
+		case BX, BXZ, BXN:
+			cmd := UnaryCommand{}
+			cmd.Op = p.tok
+			p.next()
+			if p.tok.IsLiteral() {
 				cmd.X = p.tok
 				return cmd
 			}
@@ -75,6 +97,6 @@ func (p *parser) parseCommand() interface{} {
 	return nil
 }
 
-func (p *parser) next() {
+func (p *Parser) next() {
 	p.pos, p.tok, p.lit = p.scanner.Scan()
 }

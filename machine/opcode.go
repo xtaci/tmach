@@ -42,15 +42,15 @@ const (
 	LD          // LD Rn, Rm
 	ST          // ST Rn, Rm
 	XOR         // XOR Rn, Rm
-	IXOR        // XORI Rn, Imm
 	ADD         // ADD Rn, Rm
-	IADD        // ADD Rn, Imm
 	SUB         // SUB Rn, Rm
-	ISUB        // SUB Rn, Imm
 	MUL         // MUL Rn, Rm
-	IMUL        // MUL Rn, Imm
 	DIV         // DIV Rn, Rm
-	IDIV        // DIV Rn, Imm
+	IXOR        // IXOR Rn, Imm
+	IADD        // IADD Rn, Imm
+	ISUB        // ISUB Rn, Imm
+	IMUL        // IMUL Rn, Imm
+	IDIV        // IDIV Rn, Imm
 	INC         // INC Rn
 	DEC         // DEC Rn
 	B           // B label
