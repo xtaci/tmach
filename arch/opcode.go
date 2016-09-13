@@ -40,8 +40,8 @@ const (
 	NOP  byte = iota
 	IN        // IN Rn
 	OUT       // OUT Rn
-	LD        // LD Rn, Rm
-	ST        // ST Rn, Rm
+	LD        // LD Rn, [Rm]
+	ST        // ST Rn, [Rm]
 	XOR       // XOR Rn, Rm
 	ADD       // ADD Rn, Rm
 	SUB       // SUB Rn, Rm

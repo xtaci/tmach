@@ -32,32 +32,47 @@ func (p *Program) Run() {
 	for {
 		if *pc < int32(len(p.code)) && p.code[*pc] != arch.HLT {
 			opcode := p.code[*pc]
+			//log.Println(p.data)
 			*pc++
 			switch opcode {
 			case arch.NOP:
 			case arch.IN:
-				n := p.code[*pc]
+				Rn := p.code[*pc]
 				*pc++
-				p.reg[n] = <-p.IN
+				p.reg[Rn] = <-p.IN
 			case arch.OUT:
-				n := p.code[*pc]
+				Rn := p.code[*pc]
 				*pc++
-				p.OUT <- p.reg[n]
+				p.OUT <- p.reg[Rn]
 			case arch.B:
 				off := int32(binary.LittleEndian.Uint32(p.code[*pc:]))
 				*pc = off
 			case arch.LD:
-				n := p.code[*pc]
+				Rn := p.code[*pc]
 				*pc++
-				m := p.code[*pc]
+				Rm := p.code[*pc]
 				*pc++
-				p.reg[m] = p.data[n]
+				p.reg[Rn] = p.data[p.reg[Rm]]
 			case arch.ST:
-				n := p.code[*pc]
+				Rn := p.code[*pc]
 				*pc++
-				m := p.code[*pc]
+				Rm := p.code[*pc]
 				*pc++
-				p.data[m] = p.reg[n]
+				p.data[p.reg[Rm]] = p.reg[Rn]
+			case arch.INC:
+				Rn := p.code[*pc]
+				*pc++
+				p.reg[Rn]++
+			case arch.DEC:
+				Rn := p.code[*pc]
+				*pc++
+				p.reg[Rn]--
+			case arch.XOR:
+				Rn := p.code[*pc]
+				*pc++
+				Rm := p.code[*pc]
+				*pc++
+				p.reg[Rn] ^= p.reg[Rm]
 			case arch.IMUL:
 				reg := p.code[*pc]
 				v := p.reg[reg]
