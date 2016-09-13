@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	_ "github.com/xtaci/tmach/machine"
+	_ "github.com/xtaci/tmach"
 )
 
 func Generate(commands []interface{}) *bytes.Buffer {

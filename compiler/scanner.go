@@ -53,7 +53,8 @@ func (s *Scanner) Scan() (pos Pos, tok Token, lit string) {
 		case -1:
 			tok = EOF
 		case '-':
-			tok = MINUS
+			tok, lit = s.scanNumber(false)
+			lit = "-" + lit
 		default:
 			// next reports unexpected BOMs - don't repeat
 			if ch != bom {

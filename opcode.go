@@ -1,4 +1,4 @@
-package machine
+package tmach
 
 const (
 	R0 = iota
