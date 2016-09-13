@@ -3,6 +3,7 @@ package compiler
 import (
 	"bytes"
 	"encoding/binary"
+	"log"
 
 	"github.com/xtaci/tmach"
 )
@@ -53,27 +54,39 @@ var cpuCodes = [...]byte{
 func Generate(commands []interface{}, labels map[string]int32) *bytes.Buffer {
 	code := new(bytes.Buffer)
 	for k := range commands {
+		log.Println(commands[k], code.Bytes())
 		switch typedCmd := commands[k].(type) {
-		case Command:
+		case OpCode:
 			code.WriteByte(cpuCodes[typedCmd.Op])
-		case UnaryCommand:
-			code.WriteByte(byte(typedCmd.Op))
-			if typedCmd.X.IsRegister() {
-				code.WriteByte(cpuCodes[typedCmd.X])
-			} else if typedCmd.X.IsLiteral() {
-				binary.Write(code, binary.LittleEndian, int32(typedCmd.X))
+		case UnaryOp:
+			code.WriteByte(cpuCodes[typedCmd.Op])
+			switch typedOperand := typedCmd.X.(type) {
+			case IdentOperand:
+				binary.Write(code, binary.LittleEndian, labels[typedOperand.Name])
+			case IntOperand:
+				binary.Write(code, binary.LittleEndian, typedOperand.Value)
+			case RegisterOperand:
+				code.WriteByte(cpuCodes[typedOperand.Name])
+			default:
+				log.Printf("%T\n", typedCmd.X)
 			}
-		case BinaryCommand:
-			code.WriteByte(byte(typedCmd.Op))
-			if typedCmd.X.IsRegister() {
-				code.WriteByte(cpuCodes[typedCmd.X])
-			} else if typedCmd.X.IsLiteral() {
-				binary.Write(code, binary.LittleEndian, int32(typedCmd.X))
+		case BinaryOp:
+			code.WriteByte(cpuCodes[typedCmd.Op])
+			switch typedOperand := typedCmd.X.(type) {
+			case IdentOperand:
+				binary.Write(code, binary.LittleEndian, labels[typedOperand.Name])
+			case IntOperand:
+				binary.Write(code, binary.LittleEndian, typedOperand.Value)
+			case RegisterOperand:
+				code.WriteByte(cpuCodes[typedOperand.Name])
 			}
-			if typedCmd.Y.IsRegister() {
-				code.WriteByte(cpuCodes[typedCmd.Y])
-			} else if typedCmd.Y.IsLiteral() {
-				binary.Write(code, binary.LittleEndian, int32(typedCmd.Y))
+			switch typedOperand := typedCmd.Y.(type) {
+			case IdentOperand:
+				binary.Write(code, binary.LittleEndian, labels[typedOperand.Name])
+			case IntOperand:
+				binary.Write(code, binary.LittleEndian, typedOperand.Value)
+			case RegisterOperand:
+				code.WriteByte(cpuCodes[typedOperand.Name])
 			}
 		}
 	}
