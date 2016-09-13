@@ -1,5 +1,9 @@
 package compiler
 
+type Label struct {
+	Name string
+}
+
 type OpCode struct {
 	Op Token
 }

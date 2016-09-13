@@ -1,9 +1,6 @@
 package compiler
 
-import (
-	"fmt"
-	"testing"
-)
+import "testing"
 
 func TestScanner(t *testing.T) {
 	var src = `
@@ -16,7 +13,7 @@ func TestScanner(t *testing.T) {
 	s.Init([]byte(src))
 	pos, tok, lit := s.Scan()
 	for tok != EOF && tok != ILLEGAL {
-		fmt.Println(pos, tok, lit)
+		t.Log(pos, tok, lit)
 		pos, tok, lit = s.Scan()
 	}
 }

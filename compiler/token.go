@@ -37,6 +37,7 @@ const (
 	reg_end
 
 	opcode_beg
+	NOP
 	IN   // IN Rn
 	OUT  // OUT Rn
 	LD   // LD Rn, Rm
@@ -85,6 +86,7 @@ var tokens = [...]string{
 	R14: "R14",
 	R15: "R15",
 
+	NOP:  "NOP",
 	IN:   "IN",
 	OUT:  "OUT",
 	LD:   "LD",

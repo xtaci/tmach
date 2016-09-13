@@ -5,11 +5,9 @@ import "strconv"
 // The parser structure holds the parser's internal state.
 type Parser struct {
 	scanner Scanner
-	offset  int32  // instruction offset
 	pos     Pos    // token position
 	tok     Token  // one token look-ahead
 	lit     string // token literal
-	labels  map[string]int32
 }
 
 func (p *Parser) Init(src []byte) {
@@ -32,78 +30,76 @@ func (p *Parser) Parse() []interface{} {
 }
 
 func (p *Parser) parseCommand() interface{} {
-	if p.tok.IsOperator() {
-		switch p.tok {
-		case IDENT:
-			lit := p.lit
-			p.next()
-			if p.tok == COLON {
-				p.labels[lit] = p.offset
-			}
-		case IN, OUT, INC, DEC: // unary
-			cmd := UnaryOp{}
-			cmd.Op = p.tok
+	switch p.tok {
+	case IDENT:
+		lit := p.lit
+		p.next()
+		if p.tok == COLON {
+			return Label{lit}
+		}
+	case IN, OUT, INC, DEC: // unary
+		cmd := UnaryOp{}
+		cmd.Op = p.tok
+		p.next()
+		if p.tok.IsRegister() {
+			cmd.X = RegisterOperand{Name: p.tok}
+			return cmd
+		}
+	case LD, ST: // load/store
+		cmd := BinaryOp{}
+		cmd.Op = p.tok
+		p.next()
+		if p.tok.IsRegister() {
+			cmd.X = RegisterOperand{Name: p.tok}
 			p.next()
 			if p.tok.IsRegister() {
-				cmd.X = RegisterOperand{Name: p.tok}
+				cmd.Y = RegisterOperand{Name: p.tok}
 				return cmd
 			}
-		case LD, ST: // load/store
-			cmd := BinaryOp{}
-			cmd.Op = p.tok
+		}
+	case XOR, ADD, SUB, MUL, DIV: // binary
+		cmd := BinaryOp{}
+		cmd.Op = p.tok
+		p.next()
+		if p.tok.IsRegister() {
+			cmd.X = RegisterOperand{Name: p.tok}
 			p.next()
 			if p.tok.IsRegister() {
-				cmd.X = RegisterOperand{Name: p.tok}
-				p.next()
-				if p.tok.IsRegister() {
-					cmd.Y = RegisterOperand{Name: p.tok}
-					return cmd
-				}
+				cmd.Y = RegisterOperand{Name: p.tok}
+				return cmd
 			}
-		case XOR, ADD, SUB, MUL, DIV: // binary
-			cmd := BinaryOp{}
-			cmd.Op = p.tok
-			p.next()
-			if p.tok.IsRegister() {
-				cmd.X = RegisterOperand{Name: p.tok}
-				p.next()
-				if p.tok.IsRegister() {
-					cmd.Y = RegisterOperand{Name: p.tok}
-					return cmd
-				}
-			}
-		case IXOR, IADD, ISUB, IMUL, IDIV: // binary
-			cmd := BinaryOp{}
-			cmd.Op = p.tok
-			p.next()
-			if p.tok.IsRegister() {
-				cmd.X = RegisterOperand{Name: p.tok}
-				p.next()
-				if p.tok.IsLiteral() {
-					i, _ := strconv.ParseInt(p.lit, 0, 32)
-					cmd.Y = IntOperand{Value: int32(i)}
-					return cmd
-				}
-			}
-		case B, BZ, BN: // branch
-			cmd := UnaryOp{}
-			cmd.Op = p.tok
+		}
+	case IXOR, IADD, ISUB, IMUL, IDIV: // binary
+		cmd := BinaryOp{}
+		cmd.Op = p.tok
+		p.next()
+		if p.tok.IsRegister() {
+			cmd.X = RegisterOperand{Name: p.tok}
 			p.next()
 			if p.tok.IsLiteral() {
-				cmd.X = IdentOperand{p.lit}
+				i, _ := strconv.ParseInt(p.lit, 0, 32)
+				cmd.Y = IntOperand{Value: int32(i)}
 				return cmd
 			}
-		case BX, BXZ, BXN:
-			cmd := UnaryOp{}
-			cmd.Op = p.tok
-			p.next()
-			if p.tok.IsRegister() {
-				cmd.X = RegisterOperand{Name: p.tok}
-				return cmd
-			}
-		case HLT:
-			return OpCode{Op: HLT}
 		}
+	case B, BZ, BN: // branch
+		cmd := UnaryOp{}
+		cmd.Op = p.tok
+		p.next()
+		if p.tok.IsLiteral() {
+			cmd.X = IdentOperand{p.lit}
+			return cmd
+		}
+	case BX, BXZ, BXN:
+		cmd := UnaryOp{}
+		cmd.Op = p.tok
+		p.next()
+		if p.tok.IsRegister() {
+			cmd.X = RegisterOperand{Name: p.tok}
+			return cmd
+		}
+	case NOP, HLT:
+		return OpCode{Op: p.tok}
 	}
 
 	return nil
