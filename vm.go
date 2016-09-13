@@ -33,7 +33,6 @@ func (p *Program) Run() {
 		if *pc < int32(len(p.code)) && p.code[*pc] != arch.HLT {
 			opcode := p.code[*pc]
 			*pc++
-			println("opcode:", opcode, *pc)
 			switch opcode {
 			case arch.NOP:
 			case arch.IN:
@@ -59,6 +58,13 @@ func (p *Program) Run() {
 				m := p.code[*pc]
 				*pc++
 				p.data[m] = p.reg[n]
+			case arch.IMUL:
+				reg := p.code[*pc]
+				v := p.reg[reg]
+				*pc++
+				imm := int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+				*pc++
+				p.reg[reg] = imm * v
 			default:
 				println("illegal", opcode)
 			}
