@@ -46,7 +46,7 @@ func (p *Program) Run() {
 				p.OUT <- p.reg[n]
 			case arch.B:
 				off := int32(binary.LittleEndian.Uint32(p.code[*pc:]))
-				*pc += off
+				*pc = off
 			case arch.LD:
 				n := p.code[*pc]
 				*pc++
