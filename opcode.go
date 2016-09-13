@@ -1,7 +1,7 @@
 package tmach
 
 const (
-	R0 = iota
+	R0 byte = iota
 	R1
 	R2
 	R3
@@ -37,27 +37,27 @@ const (
 
 // machine code
 const (
-	IN   = iota // IN Rn
-	OUT         // OUT Rn
-	LD          // LD Rn, Rm
-	ST          // ST Rn, Rm
-	XOR         // XOR Rn, Rm
-	ADD         // ADD Rn, Rm
-	SUB         // SUB Rn, Rm
-	MUL         // MUL Rn, Rm
-	DIV         // DIV Rn, Rm
-	IXOR        // IXOR Rn, Imm
-	IADD        // IADD Rn, Imm
-	ISUB        // ISUB Rn, Imm
-	IMUL        // IMUL Rn, Imm
-	IDIV        // IDIV Rn, Imm
-	INC         // INC Rn
-	DEC         // DEC Rn
-	B           // B label
-	BZ          // BZ label
-	BN          // BN label
-	BX          // BX Rn
-	BXZ         // BXZ Rn
-	BXN         // BXN Rn
+	IN   byte = iota // IN Rn
+	OUT              // OUT Rn
+	LD               // LD Rn, Rm
+	ST               // ST Rn, Rm
+	XOR              // XOR Rn, Rm
+	ADD              // ADD Rn, Rm
+	SUB              // SUB Rn, Rm
+	MUL              // MUL Rn, Rm
+	DIV              // DIV Rn, Rm
+	IXOR             // IXOR Rn, Imm
+	IADD             // IADD Rn, Imm
+	ISUB             // ISUB Rn, Imm
+	IMUL             // IMUL Rn, Imm
+	IDIV             // IDIV Rn, Imm
+	INC              // INC Rn
+	DEC              // DEC Rn
+	B                // B label
+	BZ               // BZ label
+	BN               // BN label
+	BX               // BX Rn
+	BXZ              // BXZ Rn
+	BXN              // BXN Rn
 	HLT
 )

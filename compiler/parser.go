@@ -77,9 +77,8 @@ func (p *Parser) parseCommand() interface{} {
 			cmd := UnaryCommand{}
 			cmd.Op = p.tok
 			p.next()
-			sign := 1
 			if p.tok.IsLiteral() {
-				cmd.X = p.tok * Token(sign)
+				cmd.X = p.tok
 				return cmd
 			}
 		case BX, BXZ, BXN:
