@@ -28,7 +28,8 @@ type Scanner struct {
 
 func (s *Scanner) Init(src []byte) error {
 	s.src = src
-	s.file = &File{}
+	fset := NewFileSet()
+	s.file = fset.AddFile("", fset.Base(), len(src))
 	s.next()
 	if s.ch == bom {
 		s.next() // ignore BOM at file beginning
@@ -40,7 +41,7 @@ func (s *Scanner) Scan() (pos Pos, tok Token, lit string) {
 	//scanAgain:
 	s.skipWhitespace()
 	// current token start
-	//pos = s.file.Pos(s.offset)
+	pos = s.file.Pos(s.offset)
 	switch ch := s.ch; {
 	case isLetter(ch):
 		lit = s.scanIdentifier()
@@ -55,6 +56,8 @@ func (s *Scanner) Scan() (pos Pos, tok Token, lit string) {
 		case '-':
 			tok, lit = s.scanNumber(false)
 			lit = "-" + lit
+		case ':':
+			tok = COLON
 		default:
 			// next reports unexpected BOMs - don't repeat
 			if ch != bom {

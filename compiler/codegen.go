@@ -50,7 +50,7 @@ var cpuCodes = [...]byte{
 	HLT:  tmach.HLT,
 }
 
-func Generate(commands []interface{}) *bytes.Buffer {
+func Generate(commands []interface{}, labels map[string]int32) *bytes.Buffer {
 	code := new(bytes.Buffer)
 	for k := range commands {
 		switch typedCmd := commands[k].(type) {

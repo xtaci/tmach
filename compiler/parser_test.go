@@ -4,9 +4,10 @@ import "testing"
 
 func TestParser(t *testing.T) {
 	var src = `
-	IN R0
-	OUT R0
-	B -2
+	L:
+		IN R0
+		OUT R0
+		B L
 	`
 	p := Parser{}
 	p.Init([]byte(src))

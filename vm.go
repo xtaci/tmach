@@ -1,5 +1,7 @@
 package tmach
 
+import "encoding/binary"
+
 type Program struct {
 	reg  [REGCOUNT]int32
 	data []int32
@@ -35,6 +37,9 @@ func (p *Program) run() {
 				n := p.code[pc+1]
 				p.in <- p.reg[n]
 				pc += 2
+			case B:
+				off := int32(binary.LittleEndian.Uint32(p.code[pc:]))
+				pc += off
 			case LD:
 				n := p.code[pc+1]
 				m := p.code[pc+2]

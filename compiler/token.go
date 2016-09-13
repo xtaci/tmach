@@ -9,10 +9,13 @@ const (
 	COMMENT
 
 	literal_beg
+	IDENT
 	INT
 	FLOAT
 	STRING
 	literal_end
+
+	COLON // :
 
 	reg_beg
 	R0
@@ -145,5 +148,5 @@ func Lookup(ident string) Token {
 	if tok, is_reg := registers[ident]; is_reg {
 		return tok
 	}
-	return ILLEGAL
+	return IDENT
 }

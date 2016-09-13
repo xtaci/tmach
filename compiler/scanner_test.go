@@ -7,9 +7,10 @@ import (
 
 func TestScanner(t *testing.T) {
 	var src = `
-	IN R0
-	OUT R0
-	B -2
+	L:
+		IN R0
+		OUT R0
+		B L
 	`
 	s := Scanner{}
 	s.Init([]byte(src))

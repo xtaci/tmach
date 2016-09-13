@@ -3,10 +3,11 @@ package compiler
 // The parser structure holds the parser's internal state.
 type Parser struct {
 	scanner Scanner
-
-	pos Pos    // token position
-	tok Token  // one token look-ahead
-	lit string // token literal
+	offset  int32  // instruction offset
+	pos     Pos    // token position
+	tok     Token  // one token look-ahead
+	lit     string // token literal
+	labels  map[string]int32
 }
 
 func (p *Parser) Init(src []byte) {
@@ -29,6 +30,12 @@ func (p *Parser) Parse() []interface{} {
 func (p *Parser) parseCommand() interface{} {
 	if p.tok.IsOperator() {
 		switch p.tok {
+		case IDENT:
+			lit := p.lit
+			p.next()
+			if p.tok == COLON {
+				p.labels[lit] = p.offset
+			}
 		case IN, OUT, INC, DEC: // unary
 			cmd := UnaryCommand{}
 			cmd.Op = p.tok
