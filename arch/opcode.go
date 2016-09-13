@@ -1,4 +1,4 @@
-package tmach
+package arch
 
 const (
 	R0 byte = iota

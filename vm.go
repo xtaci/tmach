@@ -1,21 +1,25 @@
 package tmach
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+
+	"github.com/xtaci/tmach/arch"
+)
 
 type Program struct {
-	reg  [REGCOUNT]int32
+	reg  [arch.REGCOUNT]int32
 	data []int32
 	code []byte
-	in   chan int32
-	out  chan int32
+	IN   chan int32
+	OUT  chan int32
 }
 
 func newProgram(datasize, codesize int) *Program {
 	p := new(Program)
 	p.data = make([]int32, datasize)
 	p.code = make([]byte, codesize)
-	p.in = make(chan int32)
-	p.out = make(chan int32)
+	p.IN = make(chan int32)
+	p.OUT = make(chan int32)
 	return p
 }
 
@@ -23,33 +27,40 @@ func (p *Program) Load(code []byte) {
 	copy(p.code, code)
 }
 
-func (p *Program) run() {
+func (p *Program) Run() {
+	pc := &p.reg[arch.PC]
 	for {
-		pc := p.reg[PC]
-		if pc < int32(len(p.code)) && p.code[pc] != HLT {
-			opcode := p.code[pc]
+		if *pc < int32(len(p.code)) && p.code[*pc] != arch.HLT {
+			opcode := p.code[*pc]
+			*pc++
+			println("opcode:", opcode, *pc)
 			switch opcode {
-			case IN:
-				n := p.code[pc+1]
-				p.reg[n] = <-p.in
-				pc += 2
-			case OUT:
-				n := p.code[pc+1]
-				p.in <- p.reg[n]
-				pc += 2
-			case B:
-				off := int32(binary.LittleEndian.Uint32(p.code[pc:]))
-				pc += off
-			case LD:
-				n := p.code[pc+1]
-				m := p.code[pc+2]
+			case arch.NOP:
+			case arch.IN:
+				n := p.code[*pc]
+				*pc++
+				p.reg[n] = <-p.IN
+			case arch.OUT:
+				n := p.code[*pc]
+				*pc++
+				p.OUT <- p.reg[n]
+			case arch.B:
+				off := int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+				*pc += off
+			case arch.LD:
+				n := p.code[*pc]
+				*pc++
+				m := p.code[*pc]
+				*pc++
 				p.reg[m] = p.data[n]
-				pc += 3
-			case ST:
-				n := p.code[pc+1]
-				m := p.code[pc+2]
+			case arch.ST:
+				n := p.code[*pc]
+				*pc++
+				m := p.code[*pc]
+				*pc++
 				p.data[m] = p.reg[n]
-				pc += 3
+			default:
+				println("illegal", opcode)
 			}
 		}
 	}
