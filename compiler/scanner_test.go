@@ -3,17 +3,11 @@ package compiler
 import "testing"
 
 func TestScanner(t *testing.T) {
-	var src = `
-	L:
-		IN R0
-		OUT R0
-		B L
-	`
 	s := Scanner{}
-	s.Init([]byte(src))
+	s.Init([]byte(code2))
 	pos, tok, lit := s.Scan()
 	for tok != EOF && tok != ILLEGAL {
-		t.Log(pos, tok, lit)
+		t.Logf("%+v, %+v, %+v", pos, tok, lit)
 		pos, tok, lit = s.Scan()
 	}
 }

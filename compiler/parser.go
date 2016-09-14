@@ -1,6 +1,9 @@
 package compiler
 
-import "strconv"
+import (
+	"log"
+	"strconv"
+)
 
 // The parser structure holds the parser's internal state.
 type Parser struct {
@@ -34,9 +37,10 @@ func (p *Parser) parseCommand() interface{} {
 	case IDENT:
 		lit := p.lit
 		p.next()
-		if p.tok == COLON {
-			return Label{lit}
+		if p.tok != COLON {
+			p.errorExpected(p.pos, "'"+COLON.String()+"'")
 		}
+		return Label{lit}
 	case IN, OUT, INC, DEC: // unary
 		cmd := UnaryOp{}
 		cmd.Op = p.tok
@@ -52,6 +56,7 @@ func (p *Parser) parseCommand() interface{} {
 		if p.tok.IsRegister() {
 			cmd.X = RegisterOperand{Name: p.tok}
 			p.next()
+			p.expect(COMMA)
 			if p.tok.IsRegister() {
 				cmd.Y = RegisterOperand{Name: p.tok}
 				return cmd
@@ -64,6 +69,7 @@ func (p *Parser) parseCommand() interface{} {
 		if p.tok.IsRegister() {
 			cmd.X = RegisterOperand{Name: p.tok}
 			p.next()
+			p.expect(COMMA)
 			if p.tok.IsRegister() {
 				cmd.Y = RegisterOperand{Name: p.tok}
 				return cmd
@@ -76,6 +82,7 @@ func (p *Parser) parseCommand() interface{} {
 		if p.tok.IsRegister() {
 			cmd.X = RegisterOperand{Name: p.tok}
 			p.next()
+			p.expect(COMMA)
 			if p.tok.IsLiteral() {
 				i, _ := strconv.ParseInt(p.lit, 0, 32)
 				cmd.Y = IntOperand{Value: int32(i)}
@@ -103,6 +110,50 @@ func (p *Parser) parseCommand() interface{} {
 	}
 
 	return nil
+}
+
+func (p *Parser) expect(tok Token) Pos {
+	pos := p.pos
+	if p.tok != tok {
+		p.errorExpected(pos, "'"+tok.String()+"'")
+	}
+	p.next() // make progress
+	return pos
+}
+
+func (p *Parser) errorExpected(pos Pos, msg string) {
+	msg = "expected " + msg
+	if pos == p.pos {
+		msg += ", found '" + p.tok.String() + "'"
+		if p.tok.IsLiteral() {
+			msg += " " + p.lit
+		}
+	}
+	p.error(pos, msg)
+}
+
+type bailout struct{}
+
+func (p *Parser) error(pos Pos, msg string) {
+	log.Println(pos, msg)
+	/*
+		epos := p.file.Position(pos)
+
+		// If AllErrors is not set, discard errors reported on the same line
+		// as the last recorded error and stop parsing if there are more than
+		// 10 errors.
+		if p.mode&AllErrors == 0 {
+			n := len(p.errors)
+			if n > 0 && p.errors[n-1].Pos.Line == epos.Line {
+				return // discard - likely a spurious error
+			}
+			if n > 10 {
+				panic(bailout{})
+			}
+		}
+
+		p.errors.Add(epos, msg)
+	*/
 }
 
 func (p *Parser) next() {

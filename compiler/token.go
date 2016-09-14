@@ -16,6 +16,7 @@ const (
 	literal_end
 
 	COLON // :
+	COMMA // ,
 
 	reg_beg
 	R0

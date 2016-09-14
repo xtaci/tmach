@@ -21,6 +21,7 @@ func TestCopy(t *testing.T) {
 
 	prog := newProgram(1024, 1024)
 	prog.Load(buf.Bytes())
+	t.Log(buf.Bytes())
 	go prog.Run()
 	const N = 10
 	go func() {
@@ -39,7 +40,7 @@ func TestDouble(t *testing.T) {
 		NOP
 	L:
 		IN R0
-		IMUL R0 2
+		IMUL R0,2
 		OUT R0
 		B L
 	`
@@ -68,18 +69,18 @@ func TestReverse2(t *testing.T) {
 		NOP
 	L1:
 		IN R0
-		XOR R1 R1
-		ST R0 R1
+		XOR R1,R1
+		ST R0,R1
 	L2:	
 		IN R0
 		INC R1
-		ST R0 R1
+		ST R0,R1
 
 	OUT:
-		LD R0 R1
+		LD R0,R1
 		OUT R0
 		DEC R1	
-		LD R0 R1
+		LD R0,R1
 		OUT R0
 		B L1
 	`
@@ -90,6 +91,7 @@ func TestReverse2(t *testing.T) {
 
 	prog := newProgram(1024, 1024)
 	prog.Load(buf.Bytes())
+	t.Log(buf.Bytes())
 	go prog.Run()
 	const N = 10
 	go func() {

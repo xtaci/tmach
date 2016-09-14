@@ -37,28 +37,28 @@ const (
 
 // machine code
 const (
-	NOP  byte = iota
-	IN        // IN Rn
-	OUT       // OUT Rn
-	LD        // LD Rn, [Rm]
-	ST        // ST Rn, [Rm]
-	XOR       // XOR Rn, Rm
-	ADD       // ADD Rn, Rm
-	SUB       // SUB Rn, Rm
-	MUL       // MUL Rn, Rm
-	DIV       // DIV Rn, Rm
-	IXOR      // IXOR Rn, Imm
-	IADD      // IADD Rn, Imm
-	ISUB      // ISUB Rn, Imm
-	IMUL      // IMUL Rn, Imm
-	IDIV      // IDIV Rn, Imm
-	INC       // INC Rn
-	DEC       // DEC Rn
-	B         // B label
-	BZ        // BZ label
-	BN        // BN label
-	BX        // BX Rn
-	BXZ       // BXZ Rn
-	BXN       // BXN Rn
-	HLT
+	NOP  = 0
+	IN   = 1  // IN Rn
+	OUT  = 2  // OUT Rn
+	LD   = 3  // LD Rn, [Rm]
+	ST   = 4  // ST Rn, [Rm]
+	XOR  = 5  // XOR Rn, Rm
+	ADD  = 6  // ADD Rn, Rm
+	SUB  = 7  // SUB Rn, Rm
+	MUL  = 8  // MUL Rn, Rm
+	DIV  = 9  // DIV Rn, Rm
+	IXOR = 10 // IXOR Rn, Imm
+	IADD = 11 // IADD Rn, Imm
+	ISUB = 12 // ISUB Rn, Imm
+	IMUL = 13 // IMUL Rn, Imm
+	IDIV = 14 // IDIV Rn, Imm
+	INC  = 15 // INC Rn
+	DEC  = 16 // DEC Rn
+	B    = 17 // B label
+	BZ   = 18 // BZ label
+	BN   = 19 // BN label
+	BX   = 20 // BX Rn
+	BXZ  = 21 // BXZ Rn
+	BXN  = 22 // BXN Rn
+	HLT  = 22
 )

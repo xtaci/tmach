@@ -58,6 +58,8 @@ func (s *Scanner) Scan() (pos Pos, tok Token, lit string) {
 			lit = "-" + lit
 		case ':':
 			tok = COLON
+		case ',':
+			tok = COMMA
 		default:
 			// next reports unexpected BOMs - don't repeat
 			if ch != bom {
