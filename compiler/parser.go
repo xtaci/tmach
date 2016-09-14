@@ -3,6 +3,8 @@ package compiler
 import (
 	"log"
 	"strconv"
+
+	"github.com/pkg/errors"
 )
 
 // The parser structure holds the parser's internal state.
@@ -44,72 +46,85 @@ func (p *Parser) parseCommand() interface{} {
 			p.errorExpected(p.pos, "'"+COLON.String()+"'")
 		}
 		return Label{lit}
-	case IN, OUT, INC, DEC: // unary
-		cmd := UnaryOp{}
+	case IN, OUT:
+		cmd := Operation{}
 		cmd.Op = p.tok
 		p.next()
 		if p.tok.IsRegister() {
-			cmd.X = RegisterOperand{Name: p.tok}
+			cmd.Operands = append(cmd.Operands, RegisterOperand{Name: p.tok})
 			return cmd
 		}
 	case LD, ST: // load/store
-		cmd := BinaryOp{}
+		cmd := Operation{}
 		cmd.Op = p.tok
 		p.next()
 		if p.tok.IsRegister() {
-			cmd.X = RegisterOperand{Name: p.tok}
+			cmd.Operands = append(cmd.Operands, RegisterOperand{Name: p.tok})
 			p.next()
 			p.expect(COMMA)
 			if p.tok.IsRegister() {
-				cmd.Y = RegisterOperand{Name: p.tok}
+				cmd.Operands = append(cmd.Operands, RegisterOperand{Name: p.tok})
 				return cmd
-			}
-		}
-	case XOR, ADD, SUB, MUL, DIV: // binary
-		cmd := BinaryOp{}
-		cmd.Op = p.tok
-		p.next()
-		if p.tok.IsRegister() {
-			cmd.X = RegisterOperand{Name: p.tok}
-			p.next()
-			p.expect(COMMA)
-			if p.tok.IsRegister() {
-				cmd.Y = RegisterOperand{Name: p.tok}
-				return cmd
-			}
-		}
-	case IXOR, IADD, ISUB, IMUL, IDIV: // binary
-		cmd := BinaryOp{}
-		cmd.Op = p.tok
-		p.next()
-		if p.tok.IsRegister() {
-			cmd.X = RegisterOperand{Name: p.tok}
-			p.next()
-			p.expect(COMMA)
-			if p.tok.IsLiteral() {
+			} else if p.tok.IsLiteral() {
 				i, _ := strconv.ParseInt(p.lit, 0, 32)
-				cmd.Y = IntOperand{Value: int32(i)}
+				cmd.Operands = append(cmd.Operands, IntOperand{Value: int32(i)})
+				return cmd
+			}
+		}
+	case XOR, ADD, SUB, MUL, DIV:
+		cmd := Operation{}
+		cmd.Op = p.tok
+		t := false
+		if p.tok == XOR {
+			t = true
+		}
+		if t {
+			log.Println(p.tok)
+		}
+		p.next()
+		if t {
+			log.Println(p.tok)
+		}
+		if p.tok.IsRegister() {
+			cmd.Operands = append(cmd.Operands, RegisterOperand{Name: p.tok})
+			if t {
+				log.Println(p.tok)
+			}
+			p.next()
+			if t {
+				log.Println(p.tok)
+			}
+			p.expect(COMMA)
+			if t {
+				log.Println(p.tok)
+			}
+			if p.tok.IsRegister() {
+				cmd.Operands = append(cmd.Operands, RegisterOperand{Name: p.tok})
+				return cmd
+			} else if p.tok.IsLiteral() {
+				i, _ := strconv.ParseInt(p.lit, 0, 32)
+				cmd.Operands = append(cmd.Operands, IntOperand{Value: int32(i)})
 				return cmd
 			}
 		}
 	case B, BZ, BN: // branch
-		cmd := UnaryOp{}
+		cmd := Operation{}
 		cmd.Op = p.tok
 		p.next()
 		if p.tok.IsLiteral() {
-			cmd.X = IdentOperand{p.lit}
+			cmd.Operands = append(cmd.Operands, IdentOperand{p.lit})
 			return cmd
 		}
 	case BX, BXZ, BXN:
-		cmd := UnaryOp{}
+		cmd := Operation{}
 		cmd.Op = p.tok
 		p.next()
 		if p.tok.IsRegister() {
-			cmd.X = RegisterOperand{Name: p.tok}
+			cmd.Operands = append(cmd.Operands, RegisterOperand{Name: p.tok})
 			return cmd
 		}
 	case NOP, HLT:
-		return OpCode{Op: p.tok}
+		return Operation{Op: p.tok}
 	}
 
 	return nil
@@ -138,7 +153,7 @@ func (p *Parser) errorExpected(pos Pos, msg string) {
 type bailout struct{}
 
 func (p *Parser) error(pos Pos, msg string) {
-	log.Println(pos, msg)
+	log.Printf("%+v, %+v", pos, errors.New(msg))
 	/*
 		epos := p.file.Position(pos)
 

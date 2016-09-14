@@ -7,7 +7,7 @@ import (
 	"github.com/xtaci/tmach/arch"
 )
 
-var cpuCodes = [...]byte{
+var cpuCodes = [...]int{
 	R0:  arch.R0,
 	R1:  arch.R1,
 	R2:  arch.R2,
@@ -21,34 +21,24 @@ var cpuCodes = [...]byte{
 	R10: arch.R10,
 	R11: arch.R11,
 	R12: arch.R12,
-	R13: arch.R13,
-	R14: arch.R14,
-	R15: arch.R15,
 
-	NOP:  arch.NOP,
-	IN:   arch.IN,
-	OUT:  arch.OUT,
-	LD:   arch.LD,
-	ST:   arch.ST,
-	XOR:  arch.XOR,
-	ADD:  arch.ADD,
-	SUB:  arch.SUB,
-	MUL:  arch.MUL,
-	DIV:  arch.DIV,
-	IXOR: arch.IXOR,
-	IADD: arch.IADD,
-	ISUB: arch.ISUB,
-	IMUL: arch.IMUL,
-	IDIV: arch.IDIV,
-	INC:  arch.INC,
-	DEC:  arch.DEC,
-	B:    arch.B,
-	BZ:   arch.BZ,
-	BN:   arch.BN,
-	BX:   arch.BX,
-	BXZ:  arch.BXZ,
-	BXN:  arch.BXN,
-	HLT:  arch.HLT,
+	NOP: arch.NOP,
+	IN:  arch.IN,
+	OUT: arch.OUT,
+	LD:  arch.LD,
+	ST:  arch.ST,
+	XOR: arch.XOR,
+	ADD: arch.ADD,
+	SUB: arch.SUB,
+	MUL: arch.MUL,
+	DIV: arch.DIV,
+	B:   arch.B,
+	BZ:  arch.BZ,
+	BN:  arch.BN,
+	BX:  arch.BX,
+	BXZ: arch.BXZ,
+	BXN: arch.BXN,
+	HLT: arch.HLT,
 }
 
 func Generate(commands []interface{}) *bytes.Buffer {
@@ -60,46 +50,60 @@ func Generate(commands []interface{}) *bytes.Buffer {
 		switch typedCmd := commands[k].(type) {
 		case Label:
 			labels[typedCmd.Name] = offset
-		case OpCode:
-			code.WriteByte(cpuCodes[typedCmd.Op])
-			offset++
-		case UnaryOp:
-			code.WriteByte(cpuCodes[typedCmd.Op])
-			offset++
-			switch typedOperand := typedCmd.X.(type) {
-			case IdentOperand:
-				binary.Write(code, binary.LittleEndian, labels[typedOperand.Name])
-				offset += 4
-			case IntOperand:
-				binary.Write(code, binary.LittleEndian, typedOperand.Value)
-				offset += 4
-			case RegisterOperand:
-				code.WriteByte(cpuCodes[typedOperand.Name])
-				offset++
-			}
-		case BinaryOp:
-			code.WriteByte(cpuCodes[typedCmd.Op])
-			switch typedOperand := typedCmd.X.(type) {
-			case IdentOperand:
-				binary.Write(code, binary.LittleEndian, labels[typedOperand.Name])
-				offset += 4
-			case IntOperand:
-				binary.Write(code, binary.LittleEndian, typedOperand.Value)
-				offset += 4
-			case RegisterOperand:
-				code.WriteByte(cpuCodes[typedOperand.Name])
-				offset++
-			}
-			switch typedOperand := typedCmd.Y.(type) {
-			case IdentOperand:
-				binary.Write(code, binary.LittleEndian, labels[typedOperand.Name])
-				offset += 4
-			case IntOperand:
-				binary.Write(code, binary.LittleEndian, typedOperand.Value)
-				offset += 4
-			case RegisterOperand:
-				code.WriteByte(cpuCodes[typedOperand.Name])
-				offset++
+		case Operation:
+			switch typedCmd.Op {
+			case IN, OUT: // IO operations
+				opcode := (arch.TYPE_IO << arch.TypeShift)
+				opcode |= cpuCodes[typedCmd.Op] << arch.OpShift
+				opcode |= cpuCodes[typedCmd.Operands[0].(RegisterOperand).Name] << arch.RnShift
+				binary.Write(code, binary.LittleEndian, uint16(opcode))
+				offset += 2
+			case NOP, HLT:
+				opcode := (arch.TYPE_IO << arch.TypeShift)
+				opcode |= cpuCodes[typedCmd.Op] << arch.OpShift
+				binary.Write(code, binary.LittleEndian, uint16(opcode))
+				offset += 2
+			case LD, ST:
+				opcode := (arch.TYPE_MEM << arch.TypeShift)
+				opcode |= cpuCodes[typedCmd.Op] << arch.OpShift
+				opcode |= cpuCodes[typedCmd.Operands[0].(RegisterOperand).Name] << arch.RnShift
+				immop, ok := typedCmd.Operands[1].(IntOperand)
+				if ok {
+					opcode |= 1 << arch.ImmShift
+				}
+				binary.Write(code, binary.LittleEndian, uint16(opcode))
+				offset += 2
+				if ok {
+					binary.Write(code, binary.LittleEndian, immop.Value)
+					offset += 4
+				}
+			case XOR, ADD, SUB, MUL, DIV:
+				opcode := (arch.TYPE_ALU << arch.TypeShift)
+				opcode |= cpuCodes[typedCmd.Op] << arch.OpShift
+				opcode |= cpuCodes[typedCmd.Operands[0].(RegisterOperand).Name] << arch.RnShift
+				immop, ok := typedCmd.Operands[1].(IntOperand)
+				if ok {
+					opcode |= 1 << arch.ImmShift
+				}
+				binary.Write(code, binary.LittleEndian, uint16(opcode))
+				offset += 2
+				if ok {
+					binary.Write(code, binary.LittleEndian, immop.Value)
+					offset += 4
+				}
+			case B, BZ, BN:
+				opcode := (arch.TYPE_BRANCH << arch.TypeShift)
+				opcode |= cpuCodes[typedCmd.Op] << arch.OpShift
+				opcode |= 1 << arch.ImmShift
+				binary.Write(code, binary.LittleEndian, uint16(opcode))
+				binary.Write(code, binary.LittleEndian, labels[typedCmd.Operands[0].(IdentOperand).Name])
+				offset += 6
+			case BX, BXZ, BXN:
+				opcode := (arch.TYPE_BRANCH << arch.TypeShift)
+				opcode |= cpuCodes[typedCmd.Op] << arch.OpShift
+				opcode |= cpuCodes[typedCmd.Operands[0].(RegisterOperand).Name] << arch.RnShift
+				binary.Write(code, binary.LittleEndian, uint16(opcode))
+				offset += 2
 			}
 		}
 	}

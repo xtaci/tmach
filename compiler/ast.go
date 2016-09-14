@@ -4,12 +4,12 @@ type Label struct {
 	Name string
 }
 
-type OpCode struct {
-	Op Token
+type Operation struct {
+	Op       Token
+	Operands []Operand
 }
 
-type Operand interface {
-}
+type Operand interface{}
 
 type IntOperand struct {
 	Value int32
@@ -21,15 +21,4 @@ type IdentOperand struct {
 
 type RegisterOperand struct {
 	Name Token
-}
-
-type UnaryOp struct {
-	OpCode
-	X Operand
-}
-
-type BinaryOp struct {
-	OpCode
-	X Operand
-	Y Operand
 }

@@ -7,16 +7,17 @@ import (
 )
 
 type Program struct {
-	reg  [arch.REGCOUNT]int32
-	data []int32
+	reg  [arch.REGISTER_COUNT]int32
+	data []byte
 	code []byte
+	op   uint16
 	IN   chan int32
 	OUT  chan int32
 }
 
 func newProgram(datasize, codesize int) *Program {
 	p := new(Program)
-	p.data = make([]int32, datasize)
+	p.data = make([]byte, datasize)
 	p.code = make([]byte, codesize)
 	p.IN = make(chan int32)
 	p.OUT = make(chan int32)
@@ -31,58 +32,121 @@ func (p *Program) Run() {
 	pc := &p.reg[arch.PC]
 	for {
 		if *pc < int32(len(p.code)) && p.code[*pc] != arch.HLT {
-			opcode := p.code[*pc]
-			//log.Println(p.data)
-			*pc++
-			switch opcode {
-			case arch.NOP:
-			case arch.IN:
-				Rn := p.code[*pc]
-				*pc++
-				p.reg[Rn] = <-p.IN
-			case arch.OUT:
-				Rn := p.code[*pc]
-				*pc++
-				p.OUT <- p.reg[Rn]
-			case arch.B:
-				off := int32(binary.LittleEndian.Uint32(p.code[*pc:]))
-				*pc = off
-			case arch.LD:
-				Rn := p.code[*pc]
-				*pc++
-				Rm := p.code[*pc]
-				*pc++
-				p.reg[Rn] = p.data[p.reg[Rm]]
-			case arch.ST:
-				Rn := p.code[*pc]
-				*pc++
-				Rm := p.code[*pc]
-				*pc++
-				p.data[p.reg[Rm]] = p.reg[Rn]
-			case arch.INC:
-				Rn := p.code[*pc]
-				*pc++
-				p.reg[Rn]++
-			case arch.DEC:
-				Rn := p.code[*pc]
-				*pc++
-				p.reg[Rn]--
-			case arch.XOR:
-				Rn := p.code[*pc]
-				*pc++
-				Rm := p.code[*pc]
-				*pc++
-				p.reg[Rn] ^= p.reg[Rm]
-			case arch.IMUL:
-				reg := p.code[*pc]
-				v := p.reg[reg]
-				*pc++
-				imm := int32(binary.LittleEndian.Uint32(p.code[*pc:]))
-				*pc++
-				p.reg[reg] = imm * v
-			default:
-				println("illegal", opcode)
+			opcode := binary.LittleEndian.Uint16(p.code[*pc:])
+			switch (opcode & arch.TypeMask) >> arch.TypeShift {
+			case arch.TYPE_IO:
+				p.execIO(opcode)
+			case arch.TYPE_ALU:
+				p.execALU(opcode)
+			case arch.TYPE_MEM:
+				p.execMEM(opcode)
+			case arch.TYPE_BRANCH:
+				p.execBranch(opcode)
 			}
+		}
+	}
+}
+
+func (p *Program) execIO(opcode uint16) {
+	pc := &p.reg[arch.PC]
+	switch (opcode & arch.OpMask) >> arch.OpShift {
+	case arch.NOP:
+		*pc += 2
+	case arch.IN:
+		*pc += 2
+		Rn := opcode & arch.RnMask
+		p.reg[Rn] = <-p.IN
+	case arch.OUT:
+		*pc += 2
+		Rn := opcode & arch.RnMask
+		p.OUT <- p.reg[Rn]
+	}
+}
+
+func (p *Program) execBranch(opcode uint16) {
+	pc := &p.reg[arch.PC]
+	switch (opcode & arch.OpMask) >> arch.OpShift {
+	case arch.B:
+		*pc += 2
+		*pc = int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+	}
+}
+
+func (p *Program) execALU(opcode uint16) {
+	pc := &p.reg[arch.PC]
+	Rn := (opcode & arch.RnMask) >> arch.RnShift
+	Rm := opcode & arch.RmMask
+	Imm := (opcode & arch.ImmMask) >> arch.ImmShift
+	switch (opcode & arch.OpMask) >> arch.OpShift {
+	case arch.XOR:
+		*pc += 2
+		if Imm == 0 {
+			p.reg[Rn] ^= p.reg[Rm]
+		} else {
+			p.reg[Rn] ^= int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+			*pc += 4
+		}
+	case arch.MUL:
+		*pc += 2
+		if Imm == 0 {
+			p.reg[Rn] *= p.reg[Rm]
+		} else {
+			p.reg[Rn] *= int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+			*pc += 4
+		}
+	case arch.DIV:
+		*pc += 2
+		if Imm == 0 {
+			p.reg[Rn] /= p.reg[Rm]
+		} else {
+			p.reg[Rn] /= int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+			*pc += 4
+		}
+	case arch.ADD:
+		*pc += 2
+		if Imm == 0 {
+			p.reg[Rn] += p.reg[Rm]
+		} else {
+			p.reg[Rn] += int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+			*pc += 4
+		}
+	case arch.SUB:
+		*pc += 2
+		if Imm == 0 {
+			p.reg[Rn] -= p.reg[Rm]
+		} else {
+			p.reg[Rn] -= int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+			*pc += 4
+		}
+	}
+}
+
+func (p *Program) execMEM(opcode uint16) {
+	pc := &p.reg[arch.PC]
+	Rn := (opcode & arch.RnMask) >> arch.RnShift
+	Rm := opcode & arch.RmMask
+	Imm := (opcode & arch.ImmMask) >> arch.ImmShift
+
+	switch (opcode & arch.OpMask) >> arch.OpShift {
+	case arch.LD:
+		*pc += 2
+		if Imm == 0 {
+			addr := p.reg[Rm]
+			p.reg[Rn] = int32(binary.LittleEndian.Uint32(p.data[addr:]))
+		} else {
+			addr := int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+			p.reg[Rn] = int32(binary.LittleEndian.Uint32(p.data[addr:]))
+			*pc += 4
+		}
+	case arch.ST:
+		*pc += 2
+		if Imm == 0 {
+			addr := p.reg[Rm]
+			binary.LittleEndian.PutUint32(p.data[addr:], uint32(p.reg[Rn]))
+		} else {
+			addr := int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+			binary.LittleEndian.PutUint32(p.data[addr:], uint32(p.reg[Rn]))
+			*pc += 4
 		}
 	}
 }

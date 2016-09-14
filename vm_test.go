@@ -40,7 +40,7 @@ func TestDouble(t *testing.T) {
 		NOP
 	L:
 		IN R0
-		IMUL R0,2
+		MUL R0,2
 		OUT R0
 		B L
 	`
@@ -73,13 +73,13 @@ func TestReverse2(t *testing.T) {
 		ST R0,R1
 	L2:	
 		IN R0
-		INC R1
+		ADD R1,1
 		ST R0,R1
 
 	OUT:
 		LD R0,R1
 		OUT R0
-		DEC R1	
+		SUB R1,1
 		LD R0,R1
 		OUT R0
 		B L1
