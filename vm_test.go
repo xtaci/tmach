@@ -69,18 +69,15 @@ func TestReverse2(t *testing.T) {
 		NOP
 	L1:
 		IN R0
-		XOR R1,R1
-		ST R0,R1
+		ST R0,0
 	L2:	
 		IN R0
-		ADD R1,1
-		ST R0,R1
+		ST R0,4
 
 	OUT:
-		LD R0,R1
+		LD R0,4
 		OUT R0
-		SUB R1,1
-		LD R0,R1
+		LD R0,0
 		OUT R0
 		B L1
 	`
