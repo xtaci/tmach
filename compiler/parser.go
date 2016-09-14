@@ -7,6 +7,7 @@ import (
 
 // The parser structure holds the parser's internal state.
 type Parser struct {
+	file    *File
 	scanner Scanner
 	pos     Pos    // token position
 	tok     Token  // one token look-ahead
@@ -14,6 +15,8 @@ type Parser struct {
 }
 
 func (p *Parser) Init(src []byte) {
+	fset := NewFileSet()
+	p.file = fset.AddFile("", fset.Base(), len(src))
 	p.scanner.Init(src)
 	p.next()
 }
