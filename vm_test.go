@@ -26,7 +26,7 @@ func TestCopy(t *testing.T) {
 	const N = 10
 	go func() {
 		for i := 0; i < N; i++ {
-			prog.IN <- int32(i)
+			prog.IN <- uint32(i)
 		}
 	}()
 
@@ -55,7 +55,7 @@ func TestDouble(t *testing.T) {
 	const N = 10
 	go func() {
 		for i := 0; i < N; i++ {
-			prog.IN <- int32(i)
+			prog.IN <- uint32(i)
 		}
 	}()
 
@@ -92,7 +92,7 @@ func TestReverse2(t *testing.T) {
 	const N = 10
 	go func() {
 		for i := 0; i < N; i++ {
-			prog.IN <- int32(i)
+			prog.IN <- uint32(i)
 		}
 	}()
 
