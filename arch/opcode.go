@@ -22,10 +22,10 @@ const (
 
 const (
 	// The Program Status Registers (CPSR and SPSRs)
-	COND_NEG      = 1 << 31 // Negative result from ALU flag
-	COND_ZERO     = 1 << 30 // Zero result from ALU flag.
-	COND_CARRY    = 1 << 29 // ALU operation Carried out
-	COND_OVERFLOW = 1 << 28 // ALU operation oVerflowed
+	PSR_NEG      = 1 << 31 // Negative result from ALU flag
+	PSR_ZERO     = 1 << 30 // Zero result from ALU flag.
+	PSR_CARRY    = 1 << 29 // ALU operation Carried out
+	PSR_OVERFLOW = 1 << 28 // ALU operation oVerflowed
 )
 
 // encoding (16b)

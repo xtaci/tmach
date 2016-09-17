@@ -65,10 +65,35 @@ func (p *Program) execIO(opcode uint16) {
 
 func (p *Program) execBranch(opcode uint16) {
 	pc := &p.reg[arch.PC]
+	Rn := (opcode & arch.RnMask) >> arch.RnShift
 	switch (opcode & arch.OpMask) >> arch.OpShift {
 	case arch.B:
 		*pc += 2
 		*pc = int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+	case arch.BZ:
+		*pc += 2
+		if p.reg[arch.PSR]&arch.PSR_ZERO == arch.PSR_ZERO {
+			*pc = int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+		}
+	case arch.BN:
+		*pc += 2
+		if uint32(p.reg[arch.PSR])&arch.PSR_NEG == arch.PSR_NEG {
+			*pc = int32(binary.LittleEndian.Uint32(p.code[*pc:]))
+		}
+	case arch.BX:
+		*pc = p.reg[Rn]
+	case arch.BXZ:
+		if p.reg[arch.PSR]&arch.PSR_ZERO == arch.PSR_ZERO {
+			*pc = p.reg[Rn]
+		} else {
+			*pc += 2
+		}
+	case arch.BXN:
+		if uint32(p.reg[arch.PSR])&arch.PSR_NEG == arch.PSR_NEG {
+			*pc = p.reg[Rn]
+		} else {
+			*pc += 2
+		}
 	}
 }
 

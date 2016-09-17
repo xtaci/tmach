@@ -88,7 +88,6 @@ func TestReverse2(t *testing.T) {
 
 	prog := newProgram(1024, 1024)
 	prog.Load(buf.Bytes())
-	t.Log(buf.Bytes())
 	go prog.Run()
 	const N = 10
 	go func() {
