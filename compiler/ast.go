@@ -12,7 +12,7 @@ type Operation struct {
 type Operand interface{}
 
 type IntOperand struct {
-	Value int32
+	Value int64
 }
 
 type IdentOperand struct {

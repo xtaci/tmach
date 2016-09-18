@@ -22,10 +22,7 @@ const (
 
 const (
 	// The Program Status Registers (CPSR and SPSRs)
-	PSR_NEG      = 1 << 31 // Negative result from ALU flag
-	PSR_ZERO     = 1 << 30 // Zero result from ALU flag.
-	PSR_CARRY    = 1 << 29 // ALU operation Carried out
-	PSR_OVERFLOW = 1 << 28 // ALU operation oVerflowed
+	PSR_NEG = 1 << 31 // Negative result from ALU flag
 )
 
 // encoding (16b)
@@ -74,10 +71,8 @@ const (
 
 // Branching
 const (
-	B   = 0 // B label
-	BZ  = 1 // BZ label
-	BN  = 2 // BN label
-	BX  = 3 // BX Rn
-	BXZ = 4 // BXZ Rn
-	BXN = 5 // BXN Rn
+	JMP = 0 // JMP label
+	JN  = 1 // JN label
+	JR  = 2 // JR Rn
+	JRN = 3 // JRN Rn
 )

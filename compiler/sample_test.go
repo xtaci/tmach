@@ -16,7 +16,7 @@ L2:
 	SUB R1, 1
 	LD R0, R1
 	OUT R0
-	B L1
+	JMP L1
 `
 
 var code2 = `
@@ -24,7 +24,7 @@ var code2 = `
 	L:
 		IN R0
 		OUT R0
-		B L
+		JMP L
 	`
 
 var errCode1 = `
@@ -44,5 +44,5 @@ var errCode1 = `
 		DEC R1	
 		LD R0,R1
 		OUT R0
-		B L1
+		JMP L1
 	`

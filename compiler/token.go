@@ -39,21 +39,19 @@ const (
 
 	opcode_beg
 	NOP
-	IN  // IN Rn
-	OUT // OUT Rn
-	LD  // LD Rn, Rm
-	ST  // ST Rn, Rm
-	XOR // XOR Rn, Rm/Imm
-	ADD // ADD Rn, Rm/Imm
-	SUB // SUB Rn, Rm/Imm
-	MUL // MUL Rn, Rm/Imm
-	DIV // DIV Rn, Rm/Imm
-	B   // B label
-	BZ  // BZ label
-	BN  // BN label
-	BX  // BX Rn
-	BXZ // BXZ Rn
-	BXN // BXN Rn
+	IN
+	OUT
+	LD
+	ST
+	XOR
+	ADD
+	SUB
+	MUL
+	DIV
+	JMP
+	JN
+	JR
+	JRN
 	HLT
 	opcode_end
 )
@@ -90,12 +88,10 @@ var tokens = [...]string{
 	SUB: "SUB",
 	MUL: "MUL",
 	DIV: "DIV",
-	B:   "B",
-	BN:  "BN",
-	BZ:  "BZ",
-	BX:  "BX",
-	BXN: "BXN",
-	BXZ: "BXZ",
+	JMP: "JMP",
+	JN:  "JN",
+	JR:  "JR",
+	JRN: "JRN",
 	HLT: "HLT",
 }
 

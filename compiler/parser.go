@@ -67,7 +67,7 @@ func (p *Parser) parseCommand() interface{} {
 				return cmd
 			} else if p.tok.IsLiteral() {
 				i, _ := strconv.ParseInt(p.lit, 0, 32)
-				cmd.Operands = append(cmd.Operands, IntOperand{Value: int32(i)})
+				cmd.Operands = append(cmd.Operands, IntOperand{Value: int64(i)})
 				return cmd
 			}
 		}
@@ -103,11 +103,11 @@ func (p *Parser) parseCommand() interface{} {
 				return cmd
 			} else if p.tok.IsLiteral() {
 				i, _ := strconv.ParseInt(p.lit, 0, 32)
-				cmd.Operands = append(cmd.Operands, IntOperand{Value: int32(i)})
+				cmd.Operands = append(cmd.Operands, IntOperand{Value: int64(i)})
 				return cmd
 			}
 		}
-	case B, BZ, BN: // branch
+	case JMP, JN: // branch
 		cmd := Operation{}
 		cmd.Op = p.tok
 		p.next()
@@ -115,7 +115,7 @@ func (p *Parser) parseCommand() interface{} {
 			cmd.Operands = append(cmd.Operands, IdentOperand{p.lit})
 			return cmd
 		}
-	case BX, BXZ, BXN:
+	case JR, JRN:
 		cmd := Operation{}
 		cmd.Op = p.tok
 		p.next()

@@ -12,7 +12,7 @@ func TestCopy(t *testing.T) {
 	L:
 		IN R0
 		OUT R0
-		B L
+		JMP L
 	`
 	p := compiler.Parser{}
 	p.Init([]byte(src))
@@ -25,8 +25,8 @@ func TestCopy(t *testing.T) {
 	go prog.Run()
 	const N = 10
 	go func() {
-		for i := 0; i < N; i++ {
-			prog.IN <- uint32(i)
+		for i := int64(0); i < N; i++ {
+			prog.IN <- i
 		}
 	}()
 
@@ -42,7 +42,7 @@ func TestDouble(t *testing.T) {
 		IN R0
 		MUL R0,2
 		OUT R0
-		B L
+		JMP L
 	`
 	p := compiler.Parser{}
 	p.Init([]byte(src))
@@ -54,8 +54,8 @@ func TestDouble(t *testing.T) {
 	go prog.Run()
 	const N = 10
 	go func() {
-		for i := 0; i < N; i++ {
-			prog.IN <- uint32(i)
+		for i := int64(0); i < N; i++ {
+			prog.IN <- i
 		}
 	}()
 
@@ -79,7 +79,7 @@ func TestReverse2(t *testing.T) {
 		OUT R0
 		LD R0,0
 		OUT R0
-		B L1
+		JMP L1
 	`
 	p := compiler.Parser{}
 	p.Init([]byte(src))
@@ -91,8 +91,8 @@ func TestReverse2(t *testing.T) {
 	go prog.Run()
 	const N = 10
 	go func() {
-		for i := 0; i < N; i++ {
-			prog.IN <- uint32(i)
+		for i := int64(0); i < N; i++ {
+			prog.IN <- i
 		}
 	}()
 

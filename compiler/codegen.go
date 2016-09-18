@@ -3,6 +3,7 @@ package compiler
 import (
 	"bytes"
 	"encoding/binary"
+	"unsafe"
 
 	"github.com/xtaci/tmach/arch"
 )
@@ -32,18 +33,16 @@ var cpuCodes = [...]int{
 	SUB: arch.SUB,
 	MUL: arch.MUL,
 	DIV: arch.DIV,
-	B:   arch.B,
-	BZ:  arch.BZ,
-	BN:  arch.BN,
-	BX:  arch.BX,
-	BXZ: arch.BXZ,
-	BXN: arch.BXN,
+	JMP: arch.JMP,
+	JN:  arch.JN,
+	JR:  arch.JR,
+	JRN: arch.JRN,
 	HLT: arch.HLT,
 }
 
 func Generate(commands []interface{}) *bytes.Buffer {
-	labels := make(map[string]int32)
-	offset := int32(0)
+	labels := make(map[string]uintptr)
+	offset := uintptr(0)
 	code := new(bytes.Buffer)
 
 	for k := range commands {
@@ -57,12 +56,12 @@ func Generate(commands []interface{}) *bytes.Buffer {
 				opcode |= cpuCodes[typedCmd.Op] << arch.OpShift
 				opcode |= cpuCodes[typedCmd.Operands[0].(RegisterOperand).Name] << arch.RnShift
 				binary.Write(code, binary.LittleEndian, uint16(opcode))
-				offset += 2
+				offset += unsafe.Sizeof(opcode)
 			case NOP, HLT:
 				opcode := (arch.TYPE_IO << arch.TypeShift)
 				opcode |= cpuCodes[typedCmd.Op] << arch.OpShift
 				binary.Write(code, binary.LittleEndian, uint16(opcode))
-				offset += 2
+				offset += unsafe.Sizeof(opcode)
 			case LD, ST:
 				opcode := (arch.TYPE_MEM << arch.TypeShift)
 				opcode |= cpuCodes[typedCmd.Op] << arch.OpShift
@@ -72,10 +71,10 @@ func Generate(commands []interface{}) *bytes.Buffer {
 					opcode |= 1 << arch.ImmShift
 				}
 				binary.Write(code, binary.LittleEndian, uint16(opcode))
-				offset += 2
+				offset += unsafe.Sizeof(opcode)
 				if ok {
 					binary.Write(code, binary.LittleEndian, immop.Value)
-					offset += 4
+					offset += unsafe.Sizeof(immop.Value)
 				}
 			case XOR, ADD, SUB, MUL, DIV:
 				opcode := (arch.TYPE_ALU << arch.TypeShift)
@@ -86,24 +85,24 @@ func Generate(commands []interface{}) *bytes.Buffer {
 					opcode |= 1 << arch.ImmShift
 				}
 				binary.Write(code, binary.LittleEndian, uint16(opcode))
-				offset += 2
+				offset += unsafe.Sizeof(opcode)
 				if ok {
 					binary.Write(code, binary.LittleEndian, immop.Value)
-					offset += 4
+					offset += unsafe.Sizeof(immop.Value)
 				}
-			case B, BZ, BN:
+			case JMP, JN:
 				opcode := (arch.TYPE_BRANCH << arch.TypeShift)
 				opcode |= cpuCodes[typedCmd.Op] << arch.OpShift
 				opcode |= 1 << arch.ImmShift
 				binary.Write(code, binary.LittleEndian, uint16(opcode))
 				binary.Write(code, binary.LittleEndian, labels[typedCmd.Operands[0].(IdentOperand).Name])
 				offset += 6
-			case BX, BXZ, BXN:
+			case JR, JRN:
 				opcode := (arch.TYPE_BRANCH << arch.TypeShift)
 				opcode |= cpuCodes[typedCmd.Op] << arch.OpShift
 				opcode |= cpuCodes[typedCmd.Operands[0].(RegisterOperand).Name] << arch.RnShift
 				binary.Write(code, binary.LittleEndian, uint16(opcode))
-				offset += 2
+				offset += unsafe.Sizeof(opcode)
 			}
 		}
 	}
