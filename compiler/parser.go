@@ -107,7 +107,7 @@ func (p *Parser) parseCommand() interface{} {
 				return cmd
 			}
 		}
-	case JMP, JN: // branch
+	case JMP, JN, JZ: // branch
 		cmd := Operation{}
 		cmd.Op = p.tok
 		p.next()
@@ -115,7 +115,7 @@ func (p *Parser) parseCommand() interface{} {
 			cmd.Operands = append(cmd.Operands, IdentOperand{p.lit})
 			return cmd
 		}
-	case JR, JRN:
+	case JR, JRN, JRZ:
 		cmd := Operation{}
 		cmd.Op = p.tok
 		p.next()

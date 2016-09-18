@@ -74,10 +74,21 @@ func (p *Program) execBranch(opcode uint16) {
 		if p.reg[arch.PSR]&arch.PSR_NEG == arch.PSR_NEG {
 			*pc = int64(binary.LittleEndian.Uint64(p.code[*pc:]))
 		}
+	case arch.JZ:
+		*pc += 2
+		if p.reg[arch.PSR]&arch.PSR_ZERO == arch.PSR_ZERO {
+			*pc = int64(binary.LittleEndian.Uint64(p.code[*pc:]))
+		}
 	case arch.JR:
 		*pc = p.reg[Rn]
 	case arch.JRN:
 		if p.reg[arch.PSR]&arch.PSR_NEG == arch.PSR_NEG {
+			*pc = p.reg[Rn]
+		} else {
+			*pc += 2
+		}
+	case arch.JRZ:
+		if p.reg[arch.PSR]&arch.PSR_ZERO == arch.PSR_ZERO {
 			*pc = p.reg[Rn]
 		} else {
 			*pc += 2

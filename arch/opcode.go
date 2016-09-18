@@ -22,7 +22,8 @@ const (
 
 const (
 	// The Program Status Registers (CPSR and SPSRs)
-	PSR_NEG = 1 << 31 // Negative result from ALU flag
+	PSR_NEG  = 1 << 31 // Negative result from ALU flag
+	PSR_ZERO = 1 << 30 // Zero result from ALU flag
 )
 
 // encoding (16b)
@@ -73,6 +74,9 @@ const (
 const (
 	JMP = 0 // JMP label
 	JN  = 1 // JN label
-	JR  = 2 // JR Rn
-	JRN = 3 // JRN Rn
+	JZ  = 2 // JZ label
+
+	JR  = 3 // JR Rn
+	JRN = 4 // JRN Rn
+	JRZ = 5 // JRZ Rn
 )

@@ -16,7 +16,7 @@ L2:
 	SUB R1, 1
 	LD R0, R1
 	OUT R0
-	JMP L1
+	JZ L1
 `
 
 var code2 = `

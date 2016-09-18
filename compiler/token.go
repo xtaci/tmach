@@ -50,8 +50,10 @@ const (
 	DIV
 	JMP
 	JN
+	JZ
 	JR
 	JRN
+	JRZ
 	HLT
 	opcode_end
 )
@@ -90,8 +92,10 @@ var tokens = [...]string{
 	DIV: "DIV",
 	JMP: "JMP",
 	JN:  "JN",
+	JZ:  "JZ",
 	JR:  "JR",
 	JRN: "JRN",
+	JRZ: "JRZ",
 	HLT: "HLT",
 }
 
