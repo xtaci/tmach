@@ -7,11 +7,12 @@ import (
 )
 
 type Program struct {
-	reg  [arch.REGISTER_COUNT]int64
-	data []int64
-	code []byte
-	IN   chan int64
-	OUT  chan int64
+	reg     [arch.REGISTER_COUNT]int64
+	data    []int64
+	code    []byte
+	stopped bool
+	IN      chan int64
+	OUT     chan int64
 }
 
 func newProgram(datasize, codesize int) *Program {
@@ -30,7 +31,7 @@ func (p *Program) Load(code []byte) {
 func (p *Program) Run() {
 	pc := &p.reg[arch.PC]
 	for {
-		if *pc < int64(len(p.code)) && p.code[*pc] != arch.HLT {
+		if *pc < int64(len(p.code)) && !p.stopped {
 			opcode := binary.LittleEndian.Uint16(p.code[*pc:])
 			switch (opcode & arch.TypeMask) >> arch.TypeShift {
 			case arch.TYPE_IO:
@@ -54,11 +55,17 @@ func (p *Program) execIO(opcode uint16) {
 	case arch.IN:
 		*pc += 2
 		Rn := opcode & arch.RnMask
-		p.reg[Rn] = <-p.IN
+		if v, ok := <-p.IN; !ok {
+			p.stopped = true
+		} else {
+			p.reg[Rn] = v
+		}
 	case arch.OUT:
 		*pc += 2
 		Rn := opcode & arch.RnMask
 		p.OUT <- p.reg[Rn]
+	case arch.HLT:
+		p.stopped = true
 	}
 }
 
