@@ -2,7 +2,7 @@ package arch
 
 // Register IDs
 const (
-	// 16 Arbitrary Length Register
+	// 16 Arbitrary Length Integer Register
 	R0 = iota
 	R1
 	R2
@@ -31,15 +31,15 @@ const (
 	// JMP register
 	JMPR
 
-	// Compare register
+	// Comparision register
 	CMPR
 )
 
-// Compare register flags
+// Comparision register flags
 const (
-	COMPR_EQ = 1 << iota
-	COMPR_GT
-	COMPR_LT
+	EQ = 1 << iota
+	GT
+	LT
 )
 
 // Storage Area Length, Each unit is a number of arbitrary length
