@@ -37,9 +37,9 @@ const (
 
 // Comparision register flags
 const (
-	EQ = 1 << iota
-	GT
-	LT
+	EQ = 1
+	GT = 2
+	LT = 4
 )
 
 // Area to store code
@@ -51,13 +51,16 @@ const STORAGE_SIZE = 4096
 // Instruction Set
 const (
 	// Arithmetic
-	ADD = iota
+	NOP = iota
+	ADD
 	SUB
 	MUL
 	DIV
 	QUO
 	MOD
 	NEG
+	INC
+	DEC
 
 	// Logical Operation
 	AND
@@ -69,12 +72,22 @@ const (
 	LSH
 	RSH
 
+	// Extended Math Operation
+	EXP
+	MODINVERSE
+	MODSQRT
+	GCD
+	RAND
+	BINOMIAL
+	SETBIT
+
 	// Comparision
 	CMP
 	CMPABS
 
 	// Jump
 	JMP
+	JSJ
 	JZ
 	JNZ
 	JE
@@ -86,18 +99,19 @@ const (
 
 	// Load
 	LD
-	LDI // Load to Index Register
 
 	// Store
 	ST
-	STI // Store Index Register
 
-	// Extended Operation
-	EXP
-	MODINVERSE
-	MODSQRT
-	GCD
-	RAND
-	BINOMIAL
-	SETBIT
+	// ENT
+	ENT
+
+	// MOVE
+	MOVE
+
+	// Yield
+	YIELD
+
+	// IO Operation
+	OUT
 )
