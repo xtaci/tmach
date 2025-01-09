@@ -1,2 +1,2 @@
 # tmach
-turing machine game
+arbitary length caculator
