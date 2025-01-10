@@ -20,22 +20,20 @@ const (
 	R14
 	R15
 
-	// 6 Index register(16 bit)
-	I0
-	I1
-	I2
-	I3
-	I4
-	I5
-
-	// JMP register (16 bit)
-	JMPR
+	// Program Counter
+	PC
+	// Stack Pointer
+	SP
+	// Base Pointer
+	BP
 
 	// STATUS register(8 bit)
 	// 1. EQ
 	// 2. GT
 	// 3. LT
 	// 4. Overflow
+	// 5. Zero
+	// 6. Negative
 	STATUS
 )
 
@@ -45,23 +43,18 @@ const (
 	GT       = 2
 	LT       = 4
 	OVERFLOW = 8
+	ZERO     = 16
+	NEGATIVE = 32
 )
 
-const WORD_SIZE = 16 // 16 bit word size
-
-// Word Storage Unit
-const MEM_UNIT = 65536 // 64k unit of words
+// Stack Storage Unit
+const STACK_UNIT = 65536
 
 // Number Storage Unit
-const NUM_UNIT = 4096 // 4k unit of numbers
+// 4k unit of arbitrary length numbers
+const NUM_UNIT = 4096
 
-// Ports to communicate with the outside world
-const (
-	PORT_CHAR = iota
-	PORT_NUMERIC
-)
-
-// Instruction Set
+// Assembly Opcodes
 const (
 	// Arithmetic
 	NOP = iota
@@ -100,15 +93,30 @@ const (
 	// RSH [REG], IMMEDIATE
 	RSH
 
-	// Comparision
+	// Stack Operation
+	// PUSH [REG]
+	PUSH
+	// POP [REG]
+	POP
+
+	// Call and Return
+	// CALL [MEM_ADDR]
+	CALL
+	// RET
+	RET
+
+	// Comparision and Testing a register
 	// CMP [REG], [REG]
 	// CMP [REG], IMMEDIATE
 	CMP
 
-	// Jump
+	// Test Zero, Sign, Negative
+	// TEST [REG]
+	TEST
+
+	// Jump based on the status register
 	// JMP [MEM_ADDR]
 	JMP
-	JSJ
 	JZ
 	JNZ
 	JE
@@ -118,22 +126,19 @@ const (
 	JGE
 	JLE
 
-	// Load
-	LD
+	// Load a number from number unit to register
+	// LOAD [REG], [NUM_ADDR]
+	LOAD
 
-	// Store words from register to memory unit
-	// ST [MEM_ADDR], [REG]
-	ST
+	// Store index register to memory unit
+	// STORE [REG], [NUM_ADDR]
+	STORE
 
-	// Storge JMP register to memory unit
-	// STJ [MEM_ADDR]
-	STJ
+	// Storge J to memory unit
+	// STOREJ [MEM_ADDR]
+	STOREJ
 
-	// Store number from register to number unit
-	// STNUM [NUM_ADDR], [REG]
-	STNUM
-
-	// ENT
+	// Enter a number directly to register
 	// 1. ENT [REG], IMMEDIATE
 	ENT
 
@@ -144,13 +149,9 @@ const (
 	MOVE
 
 	// Yield
-	// Suspends the current vm and returns the control to the parent
+	// Suspends current vm and returns the control to the parent
 	YIELD
 
-	// IO Operation
-	// 1. OUT REG, PORT_CHAR
-	// 2. OUT REG, PORT_NUMERIC
-	OUT
 	// Extended Math Operation
 	EXP
 	MODINVERSE
@@ -160,3 +161,6 @@ const (
 	BINOMIAL
 	SETBIT
 )
+
+// Machine Opcodes
+const ()
