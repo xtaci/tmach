@@ -1,5 +1,4 @@
-## **tmach Virtual Machine Instruction Set Architecture Specification (No Offset Version)**
-
+## **tmach Virtual Machine Instruction Set Architecture Specification**
 ### **1. Registers**
 
 #### **1.1 General-Purpose Registers**
