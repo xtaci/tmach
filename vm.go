@@ -245,9 +245,17 @@ func (vm *VM) Xor(rd, rs, rt int) {
 
 // Not performs a bitwise NOT on R[rs] and stores the result in R[rd].
 func (vm *VM) Not(rd, rs int) {
-	res := new(big.Int).Not(vm.R[rs])
+	// Create a mask for 256 bits
+	mask := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(1))
+
+	// Perform bitwise NOT using XOR with the mask
+	res := new(big.Int).Xor(vm.R[rs], mask)
+
+	// Store the result in the destination register
 	vm.R[rd].Set(res)
-	vm.SetFlag(0, res.Sign() == 0)
+
+	// Set Zero Flag (ZF) if the result is zero
+	vm.SetFlag(ZF, res.Sign() == 0)
 }
 
 // Lsh performs a logical left shift on R[rs] by n bits and stores the result in R[rd].
