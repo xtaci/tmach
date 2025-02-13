@@ -97,6 +97,32 @@ func TestDiv(t *testing.T) {
 	}
 }
 
+func TestMod(t *testing.T) {
+	vm := NewVM()
+
+	// Set values in R1 and R2
+	vm.R[1].SetInt64(20)
+	vm.R[2].SetInt64(6)
+
+	// Perform modulo operation
+	vm.Mod(0, 1, 2) // R0 = R1 % R2
+
+	// Verify the result
+	expected := big.NewInt(2)
+	if vm.R[0].Cmp(expected) != 0 {
+		t.Errorf("MOD failed: expected %v, got %v", expected, vm.R[0])
+	}
+
+	// Test division by zero
+	vm.R[2].SetInt64(0)
+	vm.Mod(0, 1, 2) // R0 = R1 % R2 (division by zero)
+
+	// Verify Divide-by-Zero Flag (DF) is set
+	if !vm.GetFlag(DF) {
+		t.Error("MOD failed: expected DF flag to be set for division by zero")
+	}
+}
+
 // TestCmp tests the CMP instruction.
 func TestCmp(t *testing.T) {
 	vm := NewVM()

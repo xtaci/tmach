@@ -180,6 +180,27 @@ func (vm *VM) Div(rd, rs, rt int) {
 	}
 }
 
+// Mod performs 256-bit modulo operation. It uses integer registers (R).
+func (vm *VM) Mod(rd, rs, rt int) {
+	if rd < 0 || rd > 7 || rs < 0 || rs > 7 || rt < 0 || rt > 7 {
+		fmt.Println("Invalid register for MOD operation")
+		return
+	}
+
+	// Check for division by zero
+	if vm.R[rt].Sign() == 0 {
+		vm.SetFlag(DF, true) // Divide-by-Zero Flag
+		return
+	}
+
+	// Perform modulo operation
+	res := new(big.Int).Mod(vm.R[rs], vm.R[rt])
+	vm.R[rd].Set(res)
+
+	// Set Zero Flag (ZF) if the result is zero
+	vm.SetFlag(ZF, res.Sign() == 0)
+}
+
 // ===================================================================
 // Comparison Instruction
 // ===================================================================
@@ -337,10 +358,9 @@ func (vm *VM) Execute(instruction uint32) {
 	ax := (instruction >> 8) & 0xF
 	imm := instruction & 0xFF
 
-	jumped := false
 	switch opcode {
 	case OP_NOP:
-		// No operation.
+		// No operation
 	case OP_LOAD:
 		vm.Load(int(rd), int(ax))
 	case OP_STORE:
@@ -353,6 +373,8 @@ func (vm *VM) Execute(instruction uint32) {
 		vm.Mul(int(rd), int(rs), int(rt))
 	case OP_DIV:
 		vm.Div(int(rd), int(rs), int(rt))
+	case OP_MOD:
+		vm.Mod(int(rd), int(rs), int(rt)) // Handle MOD instruction
 	case OP_CMP:
 		vm.Compare(int(rs), int(rt))
 	case OP_ITOF:
@@ -375,26 +397,17 @@ func (vm *VM) Execute(instruction uint32) {
 		vm.Csh(int(rd), int(rs), int(imm))
 	case OP_JMP:
 		vm.Jump(uint32(instruction & 0x00FFFFFF))
-		jumped = true
 	case OP_JZ:
 		vm.JumpIf(uint32(instruction&0x00FFFFFF), vm.GetFlag(ZF))
-		jumped = true
 	case OP_JNZ:
 		vm.JumpIf(uint32(instruction&0x00FFFFFF), !vm.GetFlag(ZF))
-		jumped = true
 	case OP_JGT:
 		vm.JumpIf(uint32(instruction&0x00FFFFFF), vm.GetFlag(GT))
-		jumped = true
 	case OP_JLT:
 		vm.JumpIf(uint32(instruction&0x00FFFFFF), vm.GetFlag(LT))
-		jumped = true
 	case OP_JEQ:
 		vm.JumpIf(uint32(instruction&0x00FFFFFF), vm.GetFlag(ZF))
-		jumped = true
 	default:
 		fmt.Printf("Unknown opcode: %02X\n", opcode)
-	}
-	if !jumped {
-		vm.PC++
 	}
 }
