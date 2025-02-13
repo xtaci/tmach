@@ -1,166 +1,37 @@
-package arch
+package main
 
-// Register IDs
+// Instruction Opcodes
 const (
-	// 16 Arbitrary Length Integer Register
-	R0 = iota
-	R1
-	R2
-	R3
-	R4
-	R5
-	R6
-	R7
-	R8
-	R9
-	R10
-	R11
-	R12
-	R13
-	R14
-	R15
-
-	// Program Counter
-	PC
-	// Stack Pointer
-	SP
-	// Base Pointer
-	BP
-
-	// STATUS register(8 bit)
-	// 1. EQ
-	// 2. GT
-	// 3. LT
-	// 4. Overflow
-	// 5. Zero
-	// 6. Negative
-	STATUS
+	OP_NOP  = 0x00 // No operation
+	OP_LOAD = 0x08 // LOAD Rd, [Ax]
+	OP_STORE= 0x09 // STORE Rs, [Ax]
+	OP_ADD  = 0x01 // ADD Rd, Rs, Rt
+	OP_SUB  = 0x02 // SUB Rd, Rs, Rt
+	OP_MUL  = 0x03 // MUL Rd, Rs, Rt
+	OP_DIV  = 0x04 // DIV Rd, Rs, Rt
+	OP_CMP  = 0x05 // CMP Rs, Rt
+	OP_ITOF = 0x06 // ITOF Fd, Rs
+	OP_FTOI = 0x07 // FTOI Rd, Fs
+	OP_AND  = 0x0A // AND Rd, Rs, Rt
+	OP_OR   = 0x0B // OR Rd, Rs, Rt
+	OP_XOR  = 0x0C // XOR Rd, Rs, Rt
+	OP_NOT  = 0x0D // NOT Rd, Rs
+	OP_LSH  = 0x0E // LSH Rd, N
+	OP_RSH  = 0x0F // RSH Rd, N
+	OP_CSH  = 0x10 // CSH Rd, N
+	OP_JMP  = 0x11 // JMP Addr
+	OP_JZ   = 0x12 // JZ Addr
+	OP_JNZ  = 0x13 // JNZ Addr
+	OP_JGT  = 0x14 // JGT Addr
+	OP_JLT  = 0x15 // JLT Addr
+	OP_JEQ  = 0x16 // JEQ Addr
 )
 
-// Comparision register flags
+// Status Register Flags
 const (
-	EQ       = 1
-	GT       = 2
-	LT       = 4
-	OVERFLOW = 8
-	ZERO     = 16
-	NEGATIVE = 32
+	ZF = 0 // Zero Flag
+	OF = 1 // Overflow Flag
+	DF = 2 // Divide-by-Zero Flag
+	LT = 3 // Less Than Flag
+	GT = 4 // Greater Than Flag
 )
-
-// Stack Storage Unit
-const STACK_UNIT = 65536
-
-// Number Storage Unit
-// 4k unit of arbitrary length numbers
-const NUM_UNIT = 4096
-
-// Assembly Opcodes
-const (
-	// Arithmetic
-	NOP = iota
-	// ADD [dest register], [src register]
-	ADD
-	// SUB [dest register], [src register]
-	SUB
-	// MUL [dest register], [src register]
-	MUL
-	// DIV [dest register], [src register]
-	DIV
-	// MOD [dest register], [src register]
-	QUO
-	// MOD [dest register], [src register]
-	MOD
-	// NEG [REG]
-	NEG
-	// INC [REG]
-	INC
-	// DEC [REG]
-	DEC
-
-	// Logical Operation
-	// AND [REG], [REG]
-	AND
-	// OR [REG], [REG]
-	OR
-	// XOR [REG], [REG]
-	XOR
-	// NOT [REG]
-	NOT
-
-	// Shift Operation
-	// LSH [REG], IMMEDIATE
-	LSH
-	// RSH [REG], IMMEDIATE
-	RSH
-
-	// Stack Operation
-	// PUSH [REG]
-	PUSH
-	// POP [REG]
-	POP
-
-	// Call and Return
-	// CALL [MEM_ADDR]
-	CALL
-	// RET
-	RET
-
-	// Comparision and Testing a register
-	// CMP [REG], [REG]
-	// CMP [REG], IMMEDIATE
-	CMP
-
-	// Test Zero, Sign, Negative
-	// TEST [REG]
-	TEST
-
-	// Jump based on the status register
-	// JMP [MEM_ADDR]
-	JMP
-	JZ
-	JNZ
-	JE
-	JNE
-	JG
-	JL
-	JGE
-	JLE
-
-	// Load a number from number unit to register
-	// LOAD [REG], [NUM_ADDR]
-	LOAD
-
-	// Store index register to memory unit
-	// STORE [REG], [NUM_ADDR]
-	STORE
-
-	// Storge J to memory unit
-	// STOREJ [MEM_ADDR]
-	STOREJ
-
-	// Enter a number directly to register
-	// 1. ENT [REG], IMMEDIATE
-	ENT
-
-	// MOVE Operation
-	// I0: Source
-	// I1: Destination
-	// I2: Length
-	MOVE
-
-	// Yield
-	// Suspends current vm and returns the control to the parent
-	YIELD
-
-	// Extended Math Operation
-	EXP
-	MODINVERSE
-	MODSQRT
-	GCD
-	RAND
-	BINOMIAL
-	SETBIT
-)
-
-// Machine Opcodes
-const ()
